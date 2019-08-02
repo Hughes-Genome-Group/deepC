@@ -1,11 +1,4 @@
-"""Tensorflow implementation to reproduce Basset with same published ...
-hyperparameters and architechture:
-3 Convolutional layers with batch norm and max pooling:
-    300 x 19 > BN > ReLU > MaxP 3w
-    200 x 11 > BN > ReLU > MaxP 4w
-    200 x 7 > BN > ReLU > MaxP 4w
-2 Linear/fully connected with 1000 units > RELU and 0.3p Dropout
-Final fully connected with 164 units into sigmoid
+"""Tensorflow implementation of DeepC using convolutional and dilated layers.
 ------------------------------------------------------------------
 
 Note:
@@ -341,7 +334,7 @@ def inference(seqs,
                     to_batch_norm=False)
             print('Conv %s shape' % j)
             print(current_layer.get_shape().as_list())
-            
+
     # Report only HIdden STate afte r Conv layers (optional) ===================
     if report_conv_hidden_state:
         ''''only report hte hidden state after the convolutional stacks'''
