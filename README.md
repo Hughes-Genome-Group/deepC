@@ -24,13 +24,13 @@ A Tensorflow DL framework for predicting Hi-C chromatin interactions using megab
 
 ### Installation
 
-Clone the repository. Import from directory as `import deepCregr`.
+Clone the repository. In python script, import from directory as `import deepCregr`.
 
 ### Content
 
 ### Running Instructions
 
-We will assemble a few basic tutorials run commands here.
+We will assemble a few basic tutorials and run commands here.
 
 ### Trained Models
 
@@ -39,8 +39,8 @@ file there for details.
 
 ### Publication
 
-  Please refer to the bioRxiv preprint: ...
+Please refer to the bioRxiv preprint [here](https://www.biorxiv.org/content/10.1101/724005v1)
 
 ### Acknowledgements
 
- Implementation of dilated convolutions was adapted from: https://github.com/ibab/tensorflow-wavenet
+Implementation of dilated convolutions was adapted from [wavenet](https://github.com/ibab/tensorflow-wavenet).
