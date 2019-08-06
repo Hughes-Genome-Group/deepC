@@ -12,7 +12,7 @@ Download and extract a model directory of interest. Every directory contains a
 hyperparameter file listing the exact parameters the model has been trained with.
 It also contains three `model.*` files that togetehr comprise a tensorflow checkpoint
 saving the graph (layout) and weights of the model network. Direct the respective
-deepC script to use the model as `/full_path/to_my_model.model`. Tensorflow will
+deepC script to use the model as `/full_path/to_my_model/model`. Tensorflow will
 recognize the model this way.
 
 ------------------------------------------
