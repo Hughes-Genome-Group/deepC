@@ -40,8 +40,10 @@ def customceil(x, base=5):
     return f
 
 # Basic model parameters as external flags -------------------------------------
-flags = tf.app.flags
+flags = tf.compat.v1.app.flags
 FLAGS = flags.FLAGS
+
+# flags.DEFINE_bool('h', False, 'Help flag.')
 flags.DEFINE_string('dlmodel', 'deepCregr', 'Specifcy the DL model file to use e.g. <endpoolDeepHaemElement>.py')
 # RUN SETTINGS
 flags.DEFINE_integer('batch_size', 1, 'Batch size.')
@@ -65,6 +67,12 @@ flags.DEFINE_string('bin_steps', 'full', 'Specify if to predict in  half bin siz
 # machine options
 flags.DEFINE_string('run_on', 'gpu', 'Select where to run on (cpu or gpu)')
 flags.DEFINE_integer('gpu', 0, 'Select a single available GPU and mask the rest. Default 0.')
+
+# # Print HELP if desired --------------------------------------------------------
+# if FLAGS.h:
+#     print("Help message:\n")
+#     print(tf.app.flags.FLAGS.flag_values_dict())
+#     sys.exit()
 
 # PREPARATION ------------------------------------------------------------------
 # import dl model architechture selected
@@ -327,7 +335,7 @@ with tf.compat.v1.Session(config = config) as sess:
             predictions = np.round(predictions, 4)
 
             # Report -----------------------------------------------------------------------
-            outfile_name = FLAGS.out_dir + "/" + 'class_predicitions_%s_%s_%s_%s_%s.txt' % (FLAGS.name_tag, variant_counter, chrom, start, end)
+            outfile_name = FLAGS.out_dir + "/" + 'class_predictions_%s_%s_%s_%s_%s.txt' % (FLAGS.name_tag, variant_counter, chrom, start, end)
             with open(outfile_name, "w") as fw:
                 fw.write('# Variant Queried: %s' % line.rstrip())
                 fw.write('\n')

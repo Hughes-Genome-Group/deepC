@@ -130,16 +130,17 @@ readDeepcInputHicBed <- function(file, prediction.bins = 101, bin.size = 10000, 
 
 
 # plot difference in deepc prediction plot
-plotDiffDeepC <- function(df1, df2, bin = 10000, threshold = 0){
+plotDiffDeepC <- function(df1, df2, bin.size = 10000, threshold = 0){
   
   sub.df <- df1 %>% filter(pos %in% df2$pos)
   sub.df$var.value <- pull(df2 %>% filter(pos %in% df1$pos) %>% select(value))
-  sub.df <- triangularize(sub.df, bin, extra = c("value", "var.value"))
+  sub.df <- triangularize(sub.df, bin.size, extra = c("value", "var.value"))
   diffplot <- sub.df %>%
     mutate(diff = var.value - value) %>%
     mutate(diff = if_else(abs(diff) >= threshold, diff, 0)) %>%
-    ggplot(aes(x = pos, y = bin, fill = diff, group = polyid)) + geom_polygon() +
-    scale_fill_gradientn(colours = brewer.pal(9, 'Spectral'))
+    ggplot(aes(x = pos, y = (bin*bin.size)/1000,, fill = diff, group = polyid)) + geom_polygon() +
+    scale_fill_gradientn(colours = brewer.pal(9, 'Spectral')) +
+    labs(y = "Genomic Distance [kb]")
   
   return(diffplot)
   
@@ -184,56 +185,6 @@ calcInsulationScoreChange <- function(diff.df, bin.size){
   return(newlist)
 }
 
-# helper fucntion to read a bedtools deployment prediction file
-readDeepcBedtoolFile <- function(file, chrom="chr16", prediction.bins = 101, gather = TRUE){
-  
-  df <- as.tibble(read.table(file, header = F))
-  names(df) <- c("chr", "start", "end", "tag", c(1:prediction.bins))
-  
-  if(gather == TRUE){
-    df <- df %>%
-      mutate(pos = start + (end - start)/2) %>%
-      select(chr, pos, c(5:(prediction.bins+5))) %>%
-      gather(bin, value, -chr, -pos) %>%
-      mutate(bin = as.numeric(bin)) %>%
-      filter(chr == chrom)
-  }
-  return(df)
-}
-
-# helper to read skeleton coordinate to bin files as data frame (tibble)
-readSkeletonRegrBins <- function(file, prediction.bins = 50, gather=TRUE){
-  
-  sdf <- as.tibble(read.table(file))
-  sdf$V4 <- as.character(sdf$V4)
-  names(sdf) <- c("chr", "start", "end", "qbins")
-  
-  df <- sdf[,c(1:3)] 
-  names(df) <- c("chr", "start", "end")
-  df <- df %>% 
-    mutate(pos = (end - start)/2 + start) %>% 
-    select(c(chr, pos))
-  
-  # split and fill classes into numeric matrix
-  mat <- matrix(data=0, nrow = dim(sdf)[1], ncol = prediction.bins)
-  b <- as.character(sdf$qbins)
-  for(i in c(1:length(b))){
-    s <- as.numeric(strsplit(b[i], ",")[[1]])
-    mat[i,] <- s
-  }
-  
-  # combine and gather for plotting
-  sdf <- as.tibble(cbind(df, mat))
-  
-  #gather if specified
-  if(gather == TRUE){
-    sdf <- sdf %>%
-      gather(bin, value, -chr, -pos) %>%
-      mutate(bin = as.numeric(bin))
-  }
-  
-  return(sdf)
-}
 
 readHicDataBins <- function(file, prediction.bins = 50, gather=TRUE){
   
@@ -490,8 +441,8 @@ getBinnedChrom <- function(chr='chr1', start=0, end=10000, window=1000, step=500
   tempfile.for.bedtools.call <- paste0("tempfile_for_bedtools_call_", timestamp, ".bed")
   tempfile.from.bedtools.call <- paste0("tempfile_from_bedtools_call_", timestamp, ".bed")
   
-  # clacl effective end point  
-  effective.end <- start + window * floor((end - start)/window)
+  # calc effective end point  
+  effective.end <- start + window * (floor((end - start)/window) + 1)
   # write tempfile for bedtools
   tdf <- data.frame(chr=chr, start=start, end=effective.end)
   write.table(tdf, file=tempfile.for.bedtools.call, col.names=F, row.names = F, quote=F, sep="\t")
@@ -945,3 +896,57 @@ upper_overlay_theme <- theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, un
 lower_overlay_theme <- upper_theme <- theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"), 
                                             axis.title.x = element_blank(), 
                                             legend.margin = margin(t= 1, l = 1, b = 1, r = 1, unit = "pt"))
+
+# TEMPORARY DISABLED should be obsolete now -----------------
+
+# # helper fucntion to read a bedtools deployment prediction file
+# readDeepcBedtoolFile <- function(file, chrom="chr16", prediction.bins = 101, gather = TRUE){
+#   
+#   df <- as.tibble(read.table(file, header = F))
+#   names(df) <- c("chr", "start", "end", "tag", c(1:prediction.bins))
+#   
+#   if(gather == TRUE){
+#     df <- df %>%
+#       mutate(pos = start + (end - start)/2) %>%
+#       select(chr, pos, c(5:(prediction.bins+5))) %>%
+#       gather(bin, value, -chr, -pos) %>%
+#       mutate(bin = as.numeric(bin)) %>%
+#       filter(chr == chrom)
+#   }
+#   return(df)
+# }
+# 
+# # helper to read skeleton coordinate to bin files as data frame (tibble)
+# readSkeletonRegrBins <- function(file, prediction.bins = 50, gather=TRUE){
+#   
+#   sdf <- as.tibble(read.table(file))
+#   sdf$V4 <- as.character(sdf$V4)
+#   names(sdf) <- c("chr", "start", "end", "qbins")
+#   
+#   df <- sdf[,c(1:3)] 
+#   names(df) <- c("chr", "start", "end")
+#   df <- df %>% 
+#     mutate(pos = (end - start)/2 + start) %>% 
+#     select(c(chr, pos))
+#   
+#   # split and fill classes into numeric matrix
+#   mat <- matrix(data=0, nrow = dim(sdf)[1], ncol = prediction.bins)
+#   b <- as.character(sdf$qbins)
+#   for(i in c(1:length(b))){
+#     s <- as.numeric(strsplit(b[i], ",")[[1]])
+#     mat[i,] <- s
+#   }
+#   
+#   # combine and gather for plotting
+#   sdf <- as.tibble(cbind(df, mat))
+#   
+#   #gather if specified
+#   if(gather == TRUE){
+#     sdf <- sdf %>%
+#       gather(bin, value, -chr, -pos) %>%
+#       mutate(bin = as.numeric(bin))
+#   }
+#   
+#   return(sdf)
+# }
+

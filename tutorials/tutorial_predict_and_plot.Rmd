@@ -1,0 +1,464 @@
+---
+title: "DeepC Tutorial Predict and Plot"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(reticulate)
+
+use_condaenv("tensorflow14", required = T)
+
+```
+
+
+```{r, include=FALSE}
+
+setwd("~/Data/machine_learning/deepC_write_tutorials_offline/tutorials/")
+
+```
+
+This tutorial runs through predicting the chromatin interactions of an example region, plotting the predictions as well as the skeleton and the "raw" HiC interactions. It will also demonstrate how to plot 1D tracks such as ChIp-seq signals attached to the deepC plots. Further, the tutorial demonstrates how to make a prediction of the impact of sequence variant, plotting the reference, variant and interactions and a differential plot and also calculate an associated damage score.
+
+You can find the smaller example files in the gitHub repository in *./tutorials*. Larger files are linked under *formatted_data_links*.
+
+
+## Global Set up
+
+Load packages and source custom functions for deepC and general HiC processing and visualization.
+
+```{r packages, message=FALSE}
+library(tidyverse)
+library(cowplot)
+library(RColorBrewer)
+
+source("../deepC/helper_for_preprocessing_and_analysis/functions_for_HiC.R")
+source("../deepC/helper_for_preprocessing_and_analysis/functions_for_deepC.R")
+
+```
+
+Set global options, specifiying bin size and bp context of the model. 
+
+```{r}
+sample <- "GM12878"
+bin.size <- 5000
+
+window.size <- 1000000 + bin.size  # bp_context
+interaction.value.bins <- 10  # how many HiC skeleton bins have been used (10 for all published models)
+prediction.bins <- window.size/bin.size  # number of predictions bins (also called number of classes later). Refers to number of bins in the vertial interaction pole
+                        # depends on the bin.size and bp_context selected: 201 for 5kb models | 101 for 10k b models 
+slope <- 1/(bin.size/2) # slope for visualizing interactions with the central bin in later visualizations 
+```
+
+
+## Chromatin interactions of reference sequence
+
+We start by predicting the chromatin interactions of a region of chr17 (test chromosome in manuscript). No variants yet just reference sequence.
+
+### Running the deepC prediction
+
+Have a look at the example regions file we provide the deepC script with. Format: chromosome start end variant in tab separated columns. The format is bed-like so 0-based, half open coordinates!
+To only predict on the reference sequence use the variant_tag 'reference' without quotation. We can run longer patches of sequence like in the example below (recommended up to ~5 Mb).
+For longer patches it is recommended to split the region of intrest into chunks of 3 - 5 Mb and concatitnate the predictions afterwards. 
+
+```{bash}
+
+head example_region_short.bed
+
+```
+
+Now we run the predictions over the example regions. It is worth running this command in a shell script for nohup or queue on a cluster as this is the labour intensive step. I usually run the python script first and then move to analysis and visualization within R.
+
+
+```{bash, eval=FALSE}
+# ! in bash
+python ../deepC/current_version/run_deploy_shape_deepCregr.py --input example_region_short.bed \  # input deepC variant bed-like file
+  --out_dir ./test_predict_out \  #output directory
+  --name_tag predict \  # name tag to add to ouput files
+  --model ../example_data/models/GM12878_primary_5kb/model \  # trained deepC model
+  --genome ~/Data/reference_sequence/hg19.fa \  # link to whole genome or chromosome wise fasta file (needs a fasta index)
+  --bp_context 1005000 \  # bp context (1 Mb + bin.size)
+  --add_window 500000 \  # how much bp to add to either side of the specified window
+  --num_classes 201 \  # The number of classes corresponds to the number of outputs (output bins of the vertical pole) (201 for 5kb models; 101 for 10kb models)
+  --bin_size 5000 \  # bin size matching to the model and input data selected 
+  --run_on gpu  # specify to run on gpu or cpu (cpu takes significantly longer)
+```
+
+Having a look at the output format. The variant file (also called so for reference predictions) is a tab separated file: chr start end pred_bin_1 pred_bin_2 ....
+
+The coordinates specify the sequence window (1Mb + bin size) centered on this are the vertical pole interaction predictions moving from close to diagonal to distal interactions. The coordinates refer to the center of a bin.sized bin. Get the center bin the predictions map to by calculating the center of this window. Subtract bin.size/2 to get left most base pair bin specification.
+
+The predictions are regression values corresponding to the HiC skeleton.
+The header files list the reference or variant region and where they map to in the reference genome. They also specify if any bp shifts occured due to differences between reference and variant length.
+This is obviously not relevant for reference predictions.
+We can concatinate multiple reference predictions files to combine bigger regions or whole chromosome predictions in a single file. To do this just concatinate, remove header lines (grep -v "#") and sort (if not concatinated in order).
+
+```{bash}
+head test_predict_out/class_predictions_predict_short_1_chr17_71000000_71999999.txt  | cut -f 1,2,3,4,5,6
+```
+
+### Visualizing the predicted interactions
+
+Read the reference prediction file. Use the *readDeepcVariantFile* function. If reading in a concatinated variant file without header use the *readDeepcVariantFileNoHeader*
+
+```{r}
+ref.pred <- readDeepcVariantFile("./test_predict_out/class_predictions_predict_short_1_chr17_71000000_71999999.txt", 
+                            prediction.bins = prediction.bins, 
+                            bin.size = bin.size, 
+                            gather = T)  # specify gather TRUE or FALSE if to gather the prediction data in a long format for ggplot2 etc. FALSE: broad format
+
+# print structure
+str(ref.pred)
+                            
+```
+The deepC variant file is stored in a list which captures the actual predictions in a data frame and the genomic coordinates from variant and relative mapping (same in reference case) and the bp shift. To view the predictions access:
+
+```{r}
+ref.pred$df
+```
+
+For plotting HiC data in triangular format (half of the matrix spanning the horizontally layed out genome) in ggplot2 we implemented a function that transforms the interaction values into a diamond shape (4 polygon points). We then plot them as the area between the points. Note this function yields really large vector graphics so only save as raster images (png/jpeg). 
+```{r}
+# provide the interaction data frame and the bin.size 
+t.rdf <- triangularize(ref.pred$df, bin = bin.size)
+```
+
+We set the limits for plotting and plot the predicted interactions 
+
+```{r single_ref_pred, fig.height = 3, fig.width = 11}
+
+# set limits for plotting
+limit1 <- ref.pred$variant.start - 500000
+limit2 <- ref.pred$variant.end + 500000
+
+# create plot
+plot.rdf <- t.rdf %>%
+  ggplot(aes(x = pos, y = (bin*bin.size)/1000, fill = value, group = polyid)) + 
+  geom_polygon() +
+  labs(y = "Genomic Distance [kb]") +
+  scale_fill_gradientn(colours = brewer.pal(9, 'YlOrRd')) + 
+  coord_cartesian(xlim=c(limit1, limit2))
+
+plot(plot.rdf)
+
+```
+
+The plot shows the predicted (skeleton) interaction value with genomic position on the x-axis and the genomic distance between the elements interacting on the y-axis. 
+
+Now lets overlap this with the actual Hi-C skeleton. Here we read in the already formated HiC skeleton data (example download links under *formated_data_links*). Check out the tutorial of how to generate your skeleton data from HiC data to reproduce or create your own. The format is tab separated: chr start end skeleton_interaction_values. The coordinates refer to the bp_context sized window and the interaction values are centered on this window. The interactions are comma separated corrseponding to the prediction bins from close to diagonal to distal interactions.
+
+```{bash}
+head ./example_skeleton_gm12878_5kb_chr17.bed
+```
+
+
+```{r}
+
+skel.file <- "./example_skeleton_gm12878_5kb_chr17.bed"
+
+# function can be used for HiC or Skeleton values as long as they are collated in a comma separated single column
+skel.df <- readDeepcInputHicBed(skel.file, prediction.bins = prediction.bins, bin.size = bin.size, gather=TRUE)
+
+head(skel.df)
+```
+
+Triangularize the skeleton and plot the overlay.
+
+```{r skel_ref_overlay, fig.height = 6, fig.width = 11}
+
+# set limits to what is covered in the reference prediction file
+limit1 <- min(ref.pred$df$pos)
+limit2 <- max(ref.pred$df$pos)
+
+# triangularize --> format to diamond shape polygons
+t.skel.df <- triangularize(skel.df, bin.size)
+
+# create the plot
+plot.skel.df <- t.skel.df %>%
+  ggplot(aes(x = pos, y = (bin*bin.size)/1000, fill = value, group = polyid)) + 
+  geom_polygon() +
+  labs(y = "Genomic Distance [kb]") +
+  scale_fill_gradientn(colours = brewer.pal(9, 'YlOrRd')) + 
+  xlim(limit1, limit2)
+
+# plot using cowplot and helper themes for merging.
+plot_grid(plot.skel.df + upper_overlay_theme,
+          plot.rdf + lower_overlay_theme, 
+          nrow = 2, align = "v")
+
+```
+
+### Adding the source HiC data
+
+To add the source HiC data we read in sparse matrix files, either in HiC-Pro format (bins with bin ids and interaction values) and a bed file specifying the genomic coordinates of the bin ids or a matrix with genomic coordinates instead of bin ids e.g. as downloaded from Rao et al. (GSE63525) use the intrachromsosomal interaction matrices and apply norm factors as desired (here KRnorm). Examples linked in *formatted_data_links*. Note this format lists the left most base pair as identifier for the respective bin.
+
+```{bash}
+head gm12878_primary_chr17_5kb.contacts.KRnorm.matrix
+```
+
+Here is how we read in HiC data, process and plot them.
+
+```{r}
+# single chromosome intra chromosomal interaction matrix
+matrix.norm.loc <- "./gm12878_primary_chr17_5kb.contacts.KRnorm.matrix"
+
+# to read in a HiC matrix with the format coord_bin1 coord_bin2 interaction_value (e.g. as Rao et al. downloads) 
+# provide the matrix file, the chromosome and bin.size arguments
+# if the format is like HiC-Pro (bin1_id bin2_id interaction_value) with a separate bed-like coordinate file
+# provide the coordinate file in the "coords=" argument of the Import function
+hic <- ImportHicproMatrix(matrix.norm.loc, chr="chr17", bin.size=bin.size)  # import
+
+hic <- trimHicCoords(hic, start = limit1-window.size, end = limit2+window.size)  # remove HiC contacts that are not withon our region of interest
+
+hic <- trimHicRange(hic, range = window.size + bin.size)  # remove all interactions that are more then bp_context apart
+
+# check the first covered position in the HiC data
+start.pos <- hic$start.pos - bin.size/2
+
+# to map the hic data into consistent bins for deepC training, prediction and plotting we create get a binned genome template
+# this requires bedtools to be installed as the R function calls bedtools in the background in bash
+# add at least the bp_context window.size to the region of interest coordinates
+binned.genome <- getBinnedChrom(chr="chr17", start=limit1-window.size, end=limit2+window.size, window=window.size, step=bin.size)
+binned.genome <- as.tibble(binned.genome)
+names(binned.genome) <- c("chr", "start", "end")
+
+# inspect
+binned.genome
+
+# filter out incomplete megabase bins
+binned.genome <- binned.genome %>%
+  mutate(width = end - start) %>%
+  filter(width == window.size) %>%
+  select(-width)
+
+# # # if necessary add sub telomeric regions to binned genome
+# to.add <- tibble(chr = chrom, start = seq(start.pos - window.size/2, start.pos - bin.size, bin.size))
+# to.add <- to.add %>% mutate(end = start + window.size)
+# binned.genome <- rbind(to.add, binned.genome)
+
+# format HiC data into deepC vertical pole distance bin data frame format
+# link to the helper perl script in your deepC repository copy
+hic.df <- getZigZagWindowInteractionsPerl(hic, binned.genome, window.size, bin.size, query.pl = "../deepC/helper_for_preprocessing_and_analysis/match_query_table.pl")
+hic.df <- as.tibble(hic.df)
+
+# to visualize hic data we add a position column and gather
+hic.df <- hic.df %>%
+  mutate(pos = start + (end - start)/2) %>%
+  select(chr, pos, c(4:(prediction.bins+3))) %>%
+  gather(bin, value, -chr, -pos) %>%
+  mutate(bin = as.numeric(bin)) %>% 
+  mutate(pos = if_else(bin %% 2 == 0, pos - bin.size/2, pos)) %>%  # this indents the even distance bin positions to get the zig-zag layout
+  filter(value > 0)
+
+# To visualize HiC data we susually quantile squeeze the very low and very high interaction values to increase contrast in the middle value range
+hic.df$value <- SetValueRange(hic.df$value, min=as.numeric(quantile(hic.df$value, .05)), max=as.numeric(quantile(hic.df$value, .95)))
+
+```
+ Now plot the HiC data as overlap.
+ 
+```{r, fig.height = 9, fig.width = 11}
+# triangularize
+t.hic.df <- triangularize(hic.df, bin.size)
+
+plot.hic.df <- ggplot(t.hic.df, aes(x = pos, y = (bin*bin.size)/1000, fill = value, group = polyid)) + 
+  geom_polygon() +
+  labs(y = "Genomic Distance [kb]") +
+  scale_fill_gradientn(colours = brewer.pal(9, 'YlOrRd')) +
+  xlim(limit1, limit2) +
+  theme(strip.background = element_blank())
+
+# plot using cowplot and helper themes for merging.
+plot_grid(plot.hic.df + upper_overlay_theme,
+          plot.skel.df + upper_overlay_theme,
+          plot.rdf + lower_overlay_theme, 
+          nrow = 3, align = "v")
+```
+ 
+
+### Overlap with 1D signals
+
+We can also overlay 1D signals from bigwig files such as CTCF ChIP-seq or DNase-seq tracks. Example tracks for GM12878 in 50 bp windows are downloadable from *formated_data_links* or just checkout ENCODE or your ressources of choice.
+
+```{r plot_tracks_overlap, fig.height = 11, fig.width = 11, message=FALSE}
+
+# we require some more libraries for this 
+library(rtracklayer)
+# library(GenomicRanges)
+
+bw.ctcf <- "./ctcf_gm12878_encode_broad_merged_w50.bw"
+bw.dnase <- "./dnase_gm12878_encode_merged_w50.bw"
+
+# initialize GRanges object
+groi <- makeGRangesFromDataFrame(tibble(chrom = "chr17", start = limit1, end = limit2))
+
+# import bgigwig signal over region of interest
+gr.ctcf <- import(bw.ctcf, which = groi)  # Import BigWig Signal
+df.ctcf <- as.tibble(gr.ctcf)
+df.ctcf <- df.ctcf %>%
+  mutate(pos = start + (end - start)/2) %>%
+  select(c(pos, width, score))
+
+gr.dnase <- import(bw.dnase, which = groi)  # Import BigWig Signal
+df.dnase <- as.tibble(gr.dnase)
+df.dnase <- df.dnase %>%
+  mutate(pos = start + (end - start)/2) %>%
+  select(c(pos, width, score))
+
+# combine in data frame
+df.tracks <- rbind(df.ctcf %>% mutate(source = "CTCF"),
+                   df.dnase %>% mutate(source = "DNase"))
+
+# plot 1D signal
+p.tracks <- df.tracks %>%
+  ggplot(aes(x = pos, y = score, col = source)) + 
+  geom_area() +
+  scale_color_brewer(palette = "Set1") + 
+  xlim(limit1, limit2) +
+  facet_wrap(~source, nrow = 2, strip.position = "right") + 
+  theme(strip.background = element_blank(), legend.position = "None")
+
+plot.skel.pred.tracks <- plot_grid(plot.hic.df + upper_overlay_theme,
+                                   plot.skel.df + upper_overlay_theme,
+                                   plot.rdf + lower_overlay_theme, 
+                                   p.tracks + theme(
+                                     axis.line.y = element_blank(),
+                                     axis.ticks.y = element_blank(),
+                                     axis.text.y = element_blank(),
+                                     axis.title.y = element_blank()
+                                     ),
+                                   nrow = 4, align = "v", axis = "tlbr", rel_heights = c(1,1,1,.7))
+
+plot(plot.skel.pred.tracks)
+```
+
+
+## Predicting the impact of sequence variants
+
+Now lets delete a CTCF site. To delete a sequence supply '.' in the variant tag (without quoatation) e.g.
+
+```{bash}
+head example_variant.bed
+```
+
+To replace a sequence chunk (or single base pair) with a sequence variant just supply the variant sequence in the variant_tag column. The length of the sequences don't have to match.
+Note that when the reference and variant sequence have unequal length, the sequence window in focus is shifted according to the difference which can lead to predicted changes shadow (see manuscript supplementary figures). You might want to consider supplementing N's instead of deleting bases.
+
+
+We go ahead and delete the example variant sequence as provided. We run the deepC predictor again supplying the variant deepC bed file. We specify to predict over an area of half the sequence window around the variant.
+
+```{bash, eval=FALSE}
+# ! in bash
+python ../deepC/current_version/run_deploy_shape_deepCregr.py --input example_variant.bed \  # evariant deepC bed-like file
+  --out_dir ./test_variant_out \  # output directory
+  --name_tag predict_variant \
+  --model ../example_data/models/GM12878_primary_5kb/model \
+  --genome ~/Data/reference_sequence/hg19.fa \
+  --bp_context 1005000 \
+  --add_window 500000 \  # window around variant to predict
+  --num_classes 201 \
+  --bin_size 5000 \
+  --run_on gpu
+```
+
+First lets have a quick look at the variant prediction output. Format as with the reference file before but now the bp to adjust are non-zero because we deleted 350 bps.
+
+```{bash}
+head test_variant_out/class_predictions_predict_variant_1_chr17_71706322_71706671.txt  |  cut -f 1,2,3,4,5
+```
+
+We read in the variant prediction data.
+
+```{r}
+
+# load variant predictions
+var.loc <- "test_variant_out/class_predictions_predict_variant_1_chr17_71706322_71706671.txt"
+var <- readDeepcVariantFile(var.loc, prediction.bins = prediction.bins, bin.size = bin.size)
+
+```
+
+And plot the overlap between reference and variant predictions as well as a substraction plot
+
+```{r deletion_overlap_plot, fig.height = 9, fig.width = 9, message=FALSE}
+
+# filter the reference prediction for only those positions that are also covered (affected by) the variant prediction
+ref.df2 <- ref.pred$df %>% 
+  filter(pos > 0) %>%
+  filter(pos >= min(var$df$pos)) %>%
+  filter(pos <= max(var$df$pos))
+
+# Make a new reference plot
+p.ref <- triangularize(ref.df2, bin.size) %>%
+  ggplot(aes(x = pos, y = (bin*bin.size)/1000, fill = value, group=polyid)) +
+  geom_polygon() +
+  geom_vline(xintercept = var$variant.start, linetype = "dotted") +
+  labs(y = "Genomic Distance [kb]", x = "chr17") +
+  ggtitle("Reference") +
+  # scale_x_continuous(breaks=c(71400000, 71700000, 72000000)) +
+  scale_fill_gradientn(colours = brewer.pal(9, 'YlOrRd')) +
+  theme(strip.background = element_blank())
+
+# make a variant
+p.var <- triangularize(var$df, bin.size) %>%
+  ggplot(aes(x = pos, y = (bin*bin.size)/1000, fill = value, group=polyid)) +
+  geom_polygon() +
+  labs(y = "Genomic Distance [kb]", x = "chr17") +
+  geom_vline(xintercept = var$variant.start, linetype = "dotted") +
+  # scale_x_continuous(breaks=c(71400000, 71700000, 72000000)) +
+  ggtitle("Variant") +
+  scale_fill_gradientn(colours = brewer.pal(9, 'YlOrRd')) +
+  theme(strip.background = element_blank())
+
+# Make a differential plot
+p.diff <- plotDiffDeepC(ref.df2, var$df, bin.size = 5000) +
+  geom_vline(xintercept = var$variant.start, linetype = "dotted") +
+  geom_abline(slope = 1/(bin.size/(2*bin.size/1000)), intercept = -var$variant.start/(bin.size/(2*bin.size/1000)), linetype = "dashed") +
+  geom_abline(slope = -1/(bin.size/(2*bin.size/1000)), intercept = var$variant.start/(bin.size/(2*bin.size/1000)), linetype = "dashed") +
+  ggtitle(paste0("Var - Ref"))
+
+# Make the combined plot
+# adding the CTCF and DNase track from earlier as well
+plot.variant.combined <- plot_grid(p.ref + upper_overlay_theme, 
+                    p.var + upper_overlay_theme, 
+                    p.diff + upper_overlay_theme,
+                    p.tracks + xlim(c(min(var$df$pos), max(var$df$pos))) + theme(
+                      axis.line.y = element_blank(),
+                      axis.ticks.y = element_blank(),
+                      axis.text.y = element_blank(),
+                      axis.title.y = element_blank()
+                    ),
+                    nrow = 4, align = "v", axis = "tlbr", rel_heights = c(1,1,1,.8))
+
+plot(plot.variant.combined)
+
+```
+
+Note that the CTCF and DNase tracks are still mapped to the reference. For larger deletions we would want to shift all data past the deletion by the bp_difference. For smaller differences the effect is however neglectable. 
+
+To get a single difference score we calculate the absolute difference (var - ref) normalized for the total number of bin interactions affected.
+
+```{r}
+
+# calculate the total number of HiC interaction tiles (bin positions) affected by the variant
+# used for normalizing the damage sscore
+covered.tiles <- dim(var$df)[1]/prediction.bins * (window.size/bin.size) 
+
+# calculate the differntial data frame 
+diff.df <- getDiffDeepC(ref.df2, var$df)
+
+# calculate the sum of the absolut difference and normalize for the number of covered tiles
+avg.abs.diff <- sum(abs(diff.df$diff)) / covered.tiles
+
+print(avg.abs.diff)
+
+```
+
+
+
+
+
+
+
+

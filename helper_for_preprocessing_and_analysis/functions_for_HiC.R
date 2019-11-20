@@ -611,6 +611,10 @@ trimHicCoords<- function(hic.obj, start=1000000, end=2000000){
   hic.obj$matrix.df <- hic.obj$matrix.df[hic.obj$matrix.df$x <= end,]
   hic.obj$matrix.df <- hic.obj$matrix.df[hic.obj$matrix.df$y >= start,]
   hic.obj$matrix.df <- hic.obj$matrix.df[hic.obj$matrix.df$y <= end,]
+  # hic.obj$matrix.df <- hic.obj$matrix.df[hic.obj$matrix.df$start >= start,]
+  # hic.obj$matrix.df <- hic.obj$matrix.df[hic.obj$matrix.df$start <= end,]
+  # hic.obj$matrix.df <- hic.obj$matrix.df[hic.obj$matrix.df$end >= start,]
+  # hic.obj$matrix.df <- hic.obj$matrix.df[hic.obj$matrix.df$end <= end,]
   
   return(hic.obj)
 }
