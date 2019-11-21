@@ -665,7 +665,11 @@ medianImputeZerosDataFrame <- function(d, k){
   
 }
 
+
 pyramidBin <- function(df, return.means = FALSE){
+  # percentile normalize into a pyramid scheme of of unequal percentiles
+  # first quantile normalize per column with 5 % percentiles and group after
+  # into 2x20% | 4x10% | 4x5% percentiles
   
   # bin into X classes stratified over distance bins
   mat <- as.matrix(df[,c(4:dim(df)[2])])
@@ -713,54 +717,7 @@ pyramidBin <- function(df, return.means = FALSE){
   
 }
 
-# temporary for bug fixing
-pyramidBinBug <- function(df, return.means = FALSE){
-  
-  # bin into X classes stratified over distance bins
-  mat <- as.matrix(df[,c(4:dim(df)[2])])
-  # quantile normalize per column 5 % percentiles and group after
-  matq <- apply(mat, 2, function(x){
-    a <- ntile(as.vector(x), 20)
-    return(a)
-  })
-  matq[matq %in% c(1:4)] <- 1
-  matq[matq %in% c(5:8)] <- 2
-  matq[matq %in% c(1:10)] <- 3
-  matq[matq %in% c(11:12)] <- 4
-  matq[matq %in% c(13:14)] <- 5
-  matq[matq %in% c(15:16)] <- 6
-  matq[matq == 17] <- 7
-  matq[matq == 18] <- 8
-  matq[matq == 19] <- 9
-  matq[matq == 20] <- 10
-  
-  # for every distance bin get mean values per quantile
-  df.mat <- as.tibble(mat)
-  df.mat <- df.mat %>% gather(bin, value)
-  df.matq <- as.tibble(matq)
-  df.matq <- df.matq %>% gather(bin, quant)
-  df.mat$quant <- df.matq$quant  # bind
-  
-  # calc means
-  df.mean <- df.mat %>%
-    group_by(bin, quant) %>%
-    summarize(mean = mean(value))
-  df.mean <- df.mean %>%
-    ungroup() %>%
-    mutate(bin = as.integer(bin))
-  
-  df[,c(4:dim(df)[2])] <- matq
-  
-  if(return.means == TRUE){
-    
-    newlist <- list(df = df, df.mean=df.mean)
-    return(newlist)
-    
-  }else{
-    return(df)  
-  }
-  
-}
+
 
 # Helpes for Deletion Processing and Weighting ================================
 # make Gausian Mask for Centre and Diagonal
@@ -898,6 +855,55 @@ lower_overlay_theme <- upper_theme <- theme(plot.margin = margin(t = 0, r = 0, b
                                             legend.margin = margin(t= 1, l = 1, b = 1, r = 1, unit = "pt"))
 
 # TEMPORARY DISABLED should be obsolete now -----------------
+
+# # temporary for bug fixing
+# pyramidBinBug <- function(df, return.means = FALSE){
+#   
+#   # bin into X classes stratified over distance bins
+#   mat <- as.matrix(df[,c(4:dim(df)[2])])
+#   # quantile normalize per column 5 % percentiles and group after
+#   matq <- apply(mat, 2, function(x){
+#     a <- ntile(as.vector(x), 20)
+#     return(a)
+#   })
+#   matq[matq %in% c(1:4)] <- 1
+#   matq[matq %in% c(5:8)] <- 2
+#   matq[matq %in% c(1:10)] <- 3
+#   matq[matq %in% c(11:12)] <- 4
+#   matq[matq %in% c(13:14)] <- 5
+#   matq[matq %in% c(15:16)] <- 6
+#   matq[matq == 17] <- 7
+#   matq[matq == 18] <- 8
+#   matq[matq == 19] <- 9
+#   matq[matq == 20] <- 10
+#   
+#   # for every distance bin get mean values per quantile
+#   df.mat <- as.tibble(mat)
+#   df.mat <- df.mat %>% gather(bin, value)
+#   df.matq <- as.tibble(matq)
+#   df.matq <- df.matq %>% gather(bin, quant)
+#   df.mat$quant <- df.matq$quant  # bind
+#   
+#   # calc means
+#   df.mean <- df.mat %>%
+#     group_by(bin, quant) %>%
+#     summarize(mean = mean(value))
+#   df.mean <- df.mean %>%
+#     ungroup() %>%
+#     mutate(bin = as.integer(bin))
+#   
+#   df[,c(4:dim(df)[2])] <- matq
+#   
+#   if(return.means == TRUE){
+#     
+#     newlist <- list(df = df, df.mean=df.mean)
+#     return(newlist)
+#     
+#   }else{
+#     return(df)  
+#   }
+#   
+# }
 
 # # helper fucntion to read a bedtools deployment prediction file
 # readDeepcBedtoolFile <- function(file, chrom="chr16", prediction.bins = 101, gather = TRUE){

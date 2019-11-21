@@ -19,5 +19,6 @@ Checkout the html files from your repo clone or download the html files. It has 
 
 1) [Predicting and plotting chromatin interactions](./tutorial_predict_and_plot.html)
 
-2) Formatting HiC data to skeleton data for deepC (#ToDo)
+2) [Formatting HiC data to skeleton data for deepC](./tutorial_format_HiC_data_for_deepC.html)
 
+3) Train a deepC network (#ToDo)
