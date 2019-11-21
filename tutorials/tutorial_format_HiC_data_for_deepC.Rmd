@@ -21,8 +21,9 @@ setwd("~/Data/machine_learning/deepC_write_tutorials_offline/tutorials/")
 
 ```
 
-This tutorial demonstrates how to format HiC data for deepC training. The tutorial walks through formating a single chromosomes. In practice we prepare each chromosome separately and concatinate all chromosome files in the end to a single file for training.
-
+This tutorial demonstrates how to format HiC data for deepC training. 
+The tutorial walks through formating a single chromosomes. In practice we prepare each 
+chromosome separately and concatinate all chromosome files in the end to a single file for training.
 
 ### Global Set up
 
@@ -45,11 +46,16 @@ sample <- "GM12878"
 bin.size <- 5000
 
 window.size <- 1000000 + bin.size  # bp_context
-interaction.value.bins <- 10  # how many HiC skeleton bins have been used (10 for all published models)
-prediction.bins <- window.size/bin.size  # number of predictions bins (also called number of classes later). Refers to number of bins in the vertial interaction pole
-# depends on the bin.size and bp_context selected: 201 for 5kb models | 101 for 10k b models 
+# how many HiC skeleton bins have been used (10 for all published models)
+interaction.value.bins <- 10  
+# number of predictions bins (also called number of classes later). Refers to number 
+# of bins in the vertial interaction pole
+# depends on the bin.size and bp_context selected: 
+# 201 for 5kb models, 101 for 10kb models 
+prediction.bins <- window.size/bin.size 
 
-genome.sizes <- read.table('hg19_chrom_sizes.txt')  # link to chromosome sizes file (ucsc style)
+# link to chromosome sizes file (ucsc style)
+genome.sizes <- read.table('hg19_chrom_sizes.txt')  
 
 ```
 
@@ -85,17 +91,21 @@ chrom <- "chr17"
 # get the respective chromosome size 
 chrom.size <- as.numeric(genome.sizes[genome.sizes[,1] == chrom,2])
 
-# to read in a HiC matrix with the format coord_bin1 coord_bin2 interaction_value (e.g. as Rao et al. downloads) 
+# to read in a HiC matrix with the format coord_bin1 coord_bin2 interaction_value 
+# (e.g. as Rao et al. downloads) 
 # provide the matrix file, the chromosome and bin.size arguments
-# if the format is like HiC-Pro (bin1_id bin2_id interaction_value) with a separate bed-like coordinate file
+# if the format is like HiC-Pro (bin1_id bin2_id interaction_value) with a separate 
+# bed-like coordinate file
 # provide the coordinate file in the "coords=" argument of the Import function
 matrix.norm.loc <- "gm12878_primary_chr17_5kb.contacts.KRnorm.matrix"
 
 hic <- ImportHicproMatrix(matrix.norm.loc, chr=chrom, bin.size=bin.size)
 
-hic <- trimHicRange(hic, range = window.size + bin.size)  # remove all interactions that are more then bp_context apart
+# remove all interactions that are more then bp_context apart
+hic <- trimHicRange(hic, range = window.size + bin.size)
 
-# The HiC data is stored in a structures list storing the bin size start position and stat id as well as the coordinates with bin associations
+# The HiC data is stored in a structures list storing the bin size start position 
+# and stat id as well as the coordinates with bin associations
 str(hic)
 
 #  and the actual contact matrix under $marix.df
@@ -104,8 +114,9 @@ hic$matrix.df
 # check the first covered position in the HiC data
 start.pos <- hic$start.pos - bin.size/2
 
-# to map the hic data into consistent bins for deepC training, prediction and plotting we create get a binned genome template
-# this requires bedtools to be installed as the R function calls bedtools in the background in bash
+# to map the hic data into consistent bins for deepC training, prediction and 
+# plotting we create get a binned genome template this requires bedtools 
+# to be installed as the R function calls bedtools in the background in bash
 binned.genome <- getBinnedChrom(chr=chrom, start=start.pos, end=chrom.size, window=window.size, step=bin.size)
 binned.genome <- as.tibble(binned.genome)
 names(binned.genome) <- c("chr", "start", "end")
@@ -127,7 +138,7 @@ Second we transform the interaction values into the HiC skeleton by applying the
 
 ```{r}
 # Convert HiC interaction matrix into genomic windows of bp_context size with the vertical 
-#"zig-zag" pole of associated chromatin interactions
+# "zig-zag" pole of associated chromatin interactions
 # Get ZigZiag Pole ZickZack Pole of interactions per window
 #    /
 #    \ 
@@ -139,15 +150,24 @@ Second we transform the interaction values into the HiC skeleton by applying the
 #       | 2 || 2 |
 # | 5 | 3 | 1 | 3 | 5 | 
 # uses helper perl scripts from the repository
-# There is a memory friendly version of the function which relies on two perl helper scripts but takes a tad longer
-tdf <- getZigZagWindowInteractionsPerl(hic, binned.genome, window.size, bin.size, 
-                                                             query.pl= "../deepC/helper_for_preprocessing_and_analysis/match_query_table.pl")
-# tdf <- getZigZagWindowInteractionsPerlMemoryFriendlyFullPerl(hic, binned.genome, window.size, bin.size, 
-#                                                              prepare.pl = "../deepC/current_version/......prepare_query_table.pl", #todo
-#                                                              query.pl= "../deepC/helper_for_preprocessing_and_analysis/match_query_table.pl")
+# There is a memory friendly version of the function which relies on two perl helper scripts
+# but takes a tad longer
+tdf <- getZigZagWindowInteractionsPerl(hic, 
+         binned.genome, 
+         window.size, 
+         bin.size,
+         query.pl= "../deepC/helper_for_preprocessing_and_analysis/match_query_table.pl")
+# tdf <- getZigZagWindowInteractionsPerlMemoryFriendlyFullPerl(hic, 
+  # binned.genome, 
+  # window.size, 
+  # bin.size,
+  # prepare.pl = "../deepC/current_version/......prepare_query_table.pl", #todo
+  # query.pl= "../deepC/helper_for_preprocessing_and_analysis/match_query_table.pl")
 
 # Impute zero values in interaction matrix with Median of a 5x5 neighborhood
-# padd with median of respective interaction distance for calculating the median on edge cases
+# padd with median of respective interaction distance for calculating 
+# the median on edge cases
+
 # first add median column
 tdf$median.value <- apply(tdf, 1, function(x){
   m <- median(as.numeric(x[c(4:length(x))]))
@@ -184,12 +204,15 @@ Now we plot a chunk of the skeleton for checking.
     mutate(pos = start+((end-start)/2)) %>%
     gather(bin, value, -chr, -start, -end, -pos, factor_key = T) %>%  # gather
     mutate(bin = as.numeric(bin)) %>%
-    mutate(pos = if_else(bin %% 2 == 0, pos - bin.size/2, pos))  # adjust positions for zig-zag layout
+    mutate(pos = if_else(bin %% 2 == 0, pos - bin.size/2, pos))  # adjust positions for 
+    # zig-zag layout
   
   # # Plot Coverage of interaction windows
   tpdf <- triangularize(pdf, bin = bin.size)
   
-  p <- ggplot(tpdf, aes(y=bin, x=pos, fill=value, group = polyid)) + geom_polygon() + scale_fill_gradientn(colours = brewer.pal(9, 'YlOrRd'))
+  p <- ggplot(tpdf, aes(y=bin, x=pos, fill=value, group = polyid)) + 
+    geom_polygon() + 
+    scale_fill_gradientn(colours = brewer.pal(9, 'YlOrRd'))
   
   plot(p)
 ```
@@ -212,7 +235,8 @@ Now we just need to store the data in txt format.
   bdf
   
   # and save in plain txt
-  write.table(bdf, file = paste0("coords_and_hic_skeleton_for_deepC_5kb_", chrom,".bed"), col.names = F, row.names = F, quote = F, sep = "\t")
+  write.table(bdf, file = paste0("coords_and_hic_skeleton_for_deepC_5kb_", chrom,".bed"),
+              col.names = F, row.names = F, quote = F, sep = "\t")
   
 ```
 

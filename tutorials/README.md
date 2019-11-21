@@ -1,4 +1,4 @@
-<img src="docs/logo_1_transparent.png" width="75">
+<img src="../docs/logo_1_transparent.png" width="75">
 
 # deepC - Tutorials
 Tutorials for the basic deepC workflows.
