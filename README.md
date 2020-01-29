@@ -26,11 +26,9 @@ A Tensorflow DL framework for predicting Hi-C chromatin interactions using megab
 
 Clone the repository. In python script, import from directory as `import deepCregr`.
 
-### Content
+### Tutorials
 
-### Running Instructions
-
-We will assemble a few basic tutorials and run commands here.
+Find tutorials [here](./tutorials).
 
 ### Trained Models
 
