@@ -503,7 +503,7 @@ def do_eval(sess,
     return test_loss  # return precision
 
 def run_training():
-  """Train endpoolBasset for a number of steps."""
+  """Train for a number of steps."""
 
   # Get the sets labels and chromosome positions
   # split into train test and validation -------------------------------
