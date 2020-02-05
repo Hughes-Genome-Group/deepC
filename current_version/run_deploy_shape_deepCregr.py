@@ -14,7 +14,7 @@ special cases:
 '''
 
 from __future__ import absolute_import, division, print_function
-import os.path
+import os
 import time
 import sys
 import re
@@ -172,6 +172,9 @@ if not os.path.exists(FLAGS.out_dir):
 
 # Load Model -------------------------------------------------------------------
 # Create a session
+if FLAGS.run_on == 'cpu':
+    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
 config = tf.compat.v1.ConfigProto();
 if FLAGS.run_on == 'gpu':
     config.gpu_options.visible_device_list = str(FLAGS.gpu)
@@ -183,7 +186,7 @@ with tf.compat.v1.Session(config = config) as sess:
     saver = tf.train.import_meta_graph(FLAGS.model + '.meta')
     saver.restore(sess, FLAGS.model)
     # get placeholders and ops ------------------------------------------------
-    graph = tf.get_default_graph()
+    graph = tf.compat.v1.get_default_graph()
     seqs_placeholder = graph.get_tensor_by_name("seqs_1:0")
     labels_placeholder = graph.get_tensor_by_name("labels:0")
     keep_prob_inner_placeholder = graph.get_tensor_by_name("keep_prob_inner:0")
