@@ -24,8 +24,7 @@ import math
 import re
 import tensorflow as tf
 import numpy as np
-# # load custom dilational layers and residuals functions
-# from ops import dilated_conv, time_to_batch, batch_to_time
+
 
 # OPERATIONS DEFINITION ============================================
 def time_to_batch(value, dilation, name=None):

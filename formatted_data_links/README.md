@@ -16,3 +16,5 @@ Coming soon ...
 * example GM12878 [HiC sparse matrix](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/data_links/chr17_5kb.contacts.KRnorm.matrix) KRnorm (Rao et al.)
 
 * [formatted data](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/data_links/data_GM12878_5kb_regression.txt.tar.gz) ready for deepC training (also see `./data_links`)
+
+* [hg19 chr17](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/data_links/hg19_chr17_fasta_for_test.gz) fasta and index for tutorial

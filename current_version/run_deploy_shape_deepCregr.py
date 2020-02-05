@@ -18,7 +18,6 @@ import os.path
 import time
 import sys
 import re
-import h5py
 import numpy as np
 import tensorflow as tf
 from math import log

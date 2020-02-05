@@ -9,8 +9,6 @@ import os.path
 import time
 import sys
 
-# from six.moves import xrange  # pylint: disable=redefined-builtin
-import h5py
 import numpy as np
 import tensorflow as tf
 import pysam
