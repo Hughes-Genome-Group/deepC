@@ -94,7 +94,6 @@ python ${SCRIPT_PATH}/run_training_deepCregr.py \
         --max_chroms ${max_chroms} \
         --save_every_chrom ${save_every_chrom} \
         --keep_prob_inner ${keep_prob_inner} \
-        --keep_prob_outer ${keep_prob_outer} \
         --batch_size ${batch_size} \
         --conv_layers ${conv_layers} \
         --hidden_units_scheme ${hidden_units_scheme} \
@@ -103,8 +102,6 @@ python ${SCRIPT_PATH}/run_training_deepCregr.py \
         --dilation_scheme ${dilation_scheme} \
         --dilation_units ${dilation_units} \
         --dilation_width ${dilation_width} \
-        --dilation_batch_norm=${dilation_batch_norm} \
-        --dilation_layer_norm=${dilation_layer_norm} \
         --dilation_residual=${dilation_residual} \
         --dilation_residual_dense=${dilation_residual_dense} \
         --epsilon ${epsilon} \
