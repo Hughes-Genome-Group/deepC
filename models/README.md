@@ -19,7 +19,7 @@ recognize the model this way.
 
 ### Links
 
-* 5 kb rsolution
+* 5 kb resolution
   * [GM12878_primary](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/models/model_deepCregr_5kb_GM12878_primary.tar.gz)
   * [GM12878_combined](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/models/model_deepCregr_5kb_GM12878_combined.tar.gz)
   * [K562](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/models/model_deepCregr_5kb_K562.tar.gz)
