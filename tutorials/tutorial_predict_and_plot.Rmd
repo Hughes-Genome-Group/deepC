@@ -17,7 +17,7 @@ use_condaenv("tensorflow14", required = T)
 
 ```{r, include=FALSE}
 
-setwd("~/Data/machine_learning/deepC_write_tutorials_offline/tutorials/")
+setwd("~/Data/machine_learning/deepC_write_tutorials_offline/run_deepc_tutorial/")
 
 ```
 
@@ -25,8 +25,21 @@ This tutorial runs through predicting the chromatin interactions of an example r
 
 You can find the smaller example files in the gitHub repository in *./tutorials*. Larger files are linked under *formatted_data_links*.
 
+The tutorial runs in R which is what we use for analysing and plotting the predictions. The deepC model training and running predictions is run in python. Because the python runs can be slow depending on your set up we recommend running them in a terminal. Commands to copy paste are listed in the tutorial and example output files are provided.
+
+For running the tutorials I recommend copying the tutorials folder from the deepC github repo to the outside of the repository. So the larger files you will download don't clock up your repo version. e.g. in terminal run:
+
+```{bash, eval=FALSE}
+# In terminal run
+cp -R ./deepC/tutorials ./run_deepc_tutorial
+
+cd ./run_deepc_tutorial
+
+```
 
 ## Global Set up
+
+In your R session / Rstudio:
 
 Load packages and source custom functions for deepC and general HiC processing and visualization.
 
@@ -65,26 +78,50 @@ To only predict on the reference sequence use the variant_tag 'reference' withou
 For longer patches it is recommended to split the region of intrest into chunks of 3 - 5 Mb and concatitnate the predictions afterwards. 
 
 ```{bash}
-
+# Run in terminal
 head example_region_short.bed
 
 ```
 
-Now we run the predictions over the example regions. It is worth running this command in a shell script for nohup or queue on a cluster as this is the labour intensive step. I usually run the python script first and then move to analysis and visualization within R.
+Now we run the predictions over the example regions. It is worth running this command in a shell script for nohup or queue on a cluster as this is the labour intensive step. I usually run the python script first and then move to analysis and visualization within R. 
 
+Please note that you will need a whole genome fasta file and a fasta index. For the tutorial you can download a chr17 only fasta file and index from (https://github.com/rschwess/deepC/tree/master/data_links). For full analysis please download a genome wide fasta file from UCSC (e.g. https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/) and index it with e.g. samtools 
+
+You will also need to download a trained model from here: https://github.com/rschwess/deepC/tree/master/models and have it extracted.
+
+For running on a GPU set --run_on gpu otherwise --run_on cpu.
+
+For orientation the example prediction run takes ~ 5 min on a GeForce GTX 980M and ~2h running on cpu.
+
+Note: Example output files are already provided with the deepC github repository if you want to skip this step.
 
 ```{bash, eval=FALSE}
-# ! in bash
+# Run in bash
+
+# explanation
 python ../deepC/current_version/run_deploy_shape_deepCregr.py --input example_region_short.bed \  # input deepC variant bed-like file
   --out_dir ./test_predict_out \  #output directory
   --name_tag predict \  # name tag to add to ouput files
-  --model ../example_data/models/GM12878_primary_5kb/model \  # trained deepC model
-  --genome ~/Data/reference_sequence/hg19.fa \  # link to whole genome or chromosome wise fasta file (needs a fasta index)
+  --model ./model_deepCregr_5kb_GM12878_primary/model \  # trained deepC model downloaded and extracted
+  --genome ./hg19_chr17_fasta_for_test/hg19_chr17.fa \  # link to whole genome or chromosome wise fasta file (needs a fasta index) or test chr17 fasta file dowloaded and extracted
   --bp_context 1005000 \  # bp context (1 Mb + bin.size)
   --add_window 500000 \  # how much bp to add to either side of the specified window
   --num_classes 201 \  # The number of classes corresponds to the number of outputs (output bins of the vertical pole) (201 for 5kb models; 101 for 10kb models)
-  --bin_size 5000 \  # bin size matching to the model and input data selected 
+  --bin_size 5000 \  # bin size matching to the model and input data selected
   --run_on gpu  # specify to run on gpu or cpu (cpu takes significantly longer)
+  
+# actually run
+python ../deepC/current_version/run_deploy_shape_deepCregr.py --input example_region_short.bed \
+  --out_dir ./test_predict_out \
+  --name_tag predict \
+  --model ./model_deepCregr_5kb_GM12878_primary/model \
+  --genome ./hg19_chr17_fasta_for_test/hg19_chr17.fa  \
+  --bp_context 1005000 \
+  --add_window 500000 \
+  --num_classes 201 \
+  --bin_size 5000 \
+  --run_on gpu
+
 ```
 
 Having a look at the output format. The variant file (also called so for reference predictions) is a tab separated file: chr start end pred_bin_1 pred_bin_2 ....
@@ -97,15 +134,23 @@ This is obviously not relevant for reference predictions.
 We can concatinate multiple reference predictions files to combine bigger regions or whole chromosome predictions in a single file. To do this just concatinate, remove header lines (grep -v "#") and sort (if not concatinated in order).
 
 ```{bash}
-head test_predict_out/class_predictions_predict_short_1_chr17_71000000_71999999.txt  | cut -f 1,2,3,4,5,6
+# run in terminal 
+
+# run this line if you are using the prediction you computed yourself
+head test_predict_out/class_predictions_predict_1_chr17_71000000_71999999.txt  | cut -f 1,2,3,4,5,6  
+
+# run this if you want to use the provided prediction output
+#head test_predict_out/class_predictions_predict_provided_1_chr17_71000000_71999999.txt  | cut -f 1,2,3,4,5,6
+
 ```
 
 ### Visualizing the predicted interactions
 
-Read the reference prediction file. Use the *readDeepcVariantFile* function. If reading in a concatinated variant file without header use the *readDeepcVariantFileNoHeader*
+Read the reference prediction file. Use the *readDeepcVariantFile* function. If reading in a concatinated variant file without header use *readDeepcVariantFileNoHeader*
 
 ```{r}
-ref.pred <- readDeepcVariantFile("./test_predict_out/class_predictions_predict_short_1_chr17_71000000_71999999.txt", 
+# change file name to provided file if not running the prediction yourself
+ref.pred <- readDeepcVariantFile("./test_predict_out/class_predictions_predict_provided_1_chr17_71000000_71999999.txt", 
                             prediction.bins = prediction.bins, 
                             bin.size = bin.size, 
                             gather = T)  # specify gather TRUE or FALSE if to gather the prediction data in a long format for ggplot2 etc. FALSE: broad format
@@ -148,9 +193,10 @@ plot(plot.rdf)
 
 The plot shows the predicted (skeleton) interaction value with genomic position on the x-axis and the genomic distance between the elements interacting on the y-axis. 
 
-Now lets overlap this with the actual Hi-C skeleton. Here we read in the already formated HiC skeleton data (example download links under *formated_data_links*). Check out the tutorial of how to generate your skeleton data from HiC data to reproduce or create your own. The format is tab separated: chr start end skeleton_interaction_values. The coordinates refer to the bp_context sized window and the interaction values are centered on this window. The interactions are comma separated corrseponding to the prediction bins from close to diagonal to distal interactions.
+Now lets overlap this with the actual Hi-C skeleton. Here we read in the already formated HiC skeleton data (example download link under *formated_data_links*). Check out the tutorial of how to generate your skeleton data from HiC data to reproduce or create your own. The format is tab separated: chr start end skeleton_interaction_values. The coordinates refer to the bp_context sized window and the interaction values are centered on this window. The interactions are comma separated corrseponding to the prediction bins from close to diagonal to distal interactions.
 
 ```{bash}
+# Run in Terminal
 head ./example_skeleton_gm12878_5kb_chr17.bed
 ```
 
@@ -168,7 +214,6 @@ head(skel.df)
 Triangularize the skeleton and plot the overlay.
 
 ```{r skel_ref_overlay, fig.height = 6, fig.width = 11}
-
 # set limits to what is covered in the reference prediction file
 limit1 <- min(ref.pred$df$pos)
 limit2 <- max(ref.pred$df$pos)
@@ -196,6 +241,7 @@ plot_grid(plot.skel.df + upper_overlay_theme,
 To add the source HiC data we read in sparse matrix files, either in HiC-Pro format (bins with bin ids and interaction values) and a bed file specifying the genomic coordinates of the bin ids or a matrix with genomic coordinates instead of bin ids e.g. as downloaded from Rao et al. (GSE63525) use the intrachromsosomal interaction matrices and apply norm factors as desired (here KRnorm). Examples linked in *formatted_data_links*. Note this format lists the left most base pair as identifier for the respective bin.
 
 ```{bash}
+# Run in terminal
 head gm12878_primary_chr17_5kb.contacts.KRnorm.matrix
 ```
 
@@ -283,13 +329,12 @@ plot_grid(plot.hic.df + upper_overlay_theme,
 We can also overlay 1D signals from bigwig files such as CTCF ChIP-seq or DNase-seq tracks. Example tracks for GM12878 in 50 bp windows are downloadable from *formated_data_links* or just checkout ENCODE or your ressources of choice.
 
 ```{r plot_tracks_overlap, fig.height = 11, fig.width = 11, message=FALSE}
-
 # we require some more libraries for this 
 library(rtracklayer)
 # library(GenomicRanges)
 
 bw.ctcf <- "./ctcf_gm12878_encode_broad_merged_w50.bw"
-bw.dnase <- "./dnase_gm12878_encode_merged_w50.bw"
+bw.dnase <- "./dnase_gm12878_encode_uw_merged_w50.bw"
 
 # initialize GRanges object
 groi <- makeGRangesFromDataFrame(tibble(chrom = "chr17", start = limit1, end = limit2))
@@ -337,27 +382,28 @@ plot(plot.skel.pred.tracks)
 
 ## Predicting the impact of sequence variants
 
-Now lets delete a CTCF site. To delete a sequence supply '.' in the variant tag (without quoatation) e.g.
+Now lets delete a CTCF site. To delete a sequence supply '.' in the variant tag (without quotation) e.g.
 
 ```{bash}
+#Run in terminal
 head example_variant.bed
 ```
 
 To replace a sequence chunk (or single base pair) with a sequence variant just supply the variant sequence in the variant_tag column. The length of the sequences don't have to match.
-Note that when the reference and variant sequence have unequal length, the sequence window in focus is shifted according to the difference which can lead to predicted changes shadow (see manuscript supplementary figures). You might want to consider supplementing N's instead of deleting bases.
+Note that when the reference and variant sequence have unequal length, the sequence window in focus is shifted according to the difference which can lead to a shadow of predicted changes. You might want to consider supplementing N's instead of deleting bases.
 
 
 We go ahead and delete the example variant sequence as provided. We run the deepC predictor again supplying the variant deepC bed file. We specify to predict over an area of half the sequence window around the variant.
 
 ```{bash, eval=FALSE}
-# ! in bash
-python ../deepC/current_version/run_deploy_shape_deepCregr.py --input example_variant.bed \  # evariant deepC bed-like file
-  --out_dir ./test_variant_out \  # output directory
+# Run in terminal
+python ../deepC/current_version/run_deploy_shape_deepCregr.py --input example_variant.bed \
+  --out_dir ./test_variant_out \
   --name_tag predict_variant \
-  --model ../example_data/models/GM12878_primary_5kb/model \
-  --genome ~/Data/reference_sequence/hg19.fa \
+  --model ./model_deepCregr_5kb_GM12878_primary/model \
+  --genome ./hg19_chr17_fasta_for_test/hg19_chr17.fa  \
   --bp_context 1005000 \
-  --add_window 500000 \  # window around variant to predict
+  --add_window 500000 \
   --num_classes 201 \
   --bin_size 5000 \
   --run_on gpu
@@ -366,13 +412,14 @@ python ../deepC/current_version/run_deploy_shape_deepCregr.py --input example_va
 First lets have a quick look at the variant prediction output. Format as with the reference file before but now the bp to adjust are non-zero because we deleted 350 bps.
 
 ```{bash}
+# Run in terminal
+# use the provided file instead if you did not run the prediction yourself.
 head test_variant_out/class_predictions_predict_variant_1_chr17_71706322_71706671.txt  |  cut -f 1,2,3,4,5
 ```
 
-We read in the variant prediction data.
+We read in the variant prediction data. (Use the "provided" txt file if you haven't run the prediction yourself.)
 
 ```{r}
-
 # load variant predictions
 var.loc <- "test_variant_out/class_predictions_predict_variant_1_chr17_71706322_71706671.txt"
 var <- readDeepcVariantFile(var.loc, prediction.bins = prediction.bins, bin.size = bin.size)
@@ -382,7 +429,6 @@ var <- readDeepcVariantFile(var.loc, prediction.bins = prediction.bins, bin.size
 And plot the overlap between reference and variant predictions as well as a substraction plot
 
 ```{r deletion_overlap_plot, fig.height = 9, fig.width = 9, message=FALSE}
-
 # filter the reference prediction for only those positions that are also covered (affected by) the variant prediction
 ref.df2 <- ref.pred$df %>% 
   filter(pos > 0) %>%
@@ -440,7 +486,6 @@ Note that the CTCF and DNase tracks are still mapped to the reference. For large
 To get a single difference score we calculate the absolute difference (var - ref) normalized for the total number of bin interactions affected.
 
 ```{r}
-
 # calculate the total number of HiC interaction tiles (bin positions) affected by the variant
 # used for normalizing the damage sscore
 covered.tiles <- dim(var$df)[1]/prediction.bins * (window.size/bin.size) 

@@ -13,6 +13,7 @@ A Tensorflow DL framework for predicting Hi-C chromatin interactions using megab
 
   * python 3.5 +
   * tensorflow
+    * GPU support is preferable for predictions and essential for training
     * developed under 1.8.0, use legacy version
     * compatible with latest version 1.14.0, use current version
     * the legacy versions should work with every tf version 1.8.0 or higher bearing with deprecation warnings
@@ -34,6 +35,7 @@ A Tensorflow DL framework for predicting Hi-C chromatin interactions using megab
 
   * training deepC models requires running with GPU support for several hours (up to days depending on the dataset and epochs aimed for)
   * running predictions is feasible without but runs significantly faster with a GPU
+  * for example predicting the impact of a variant as in the tutorial provided requires ~5 mins with GPU support and ~ 2h on CPU.
 
 ### Installation
 
