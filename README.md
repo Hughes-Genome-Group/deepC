@@ -7,27 +7,32 @@ A Tensorflow DL framework for predicting Hi-C chromatin interactions using megab
 
 ### Description
 
+This repository contains the core deepC python code, R scripts and functions for downstream analysis as well as tutorials and links to example data.
 
+The core code is implemented in python (v3.5+) and tensorflow (v1). For downstream analysis and visualizations we use R and custom functions for handling HiC data
+and deepC predictions.
 
 ### Requirements
 
   * python 3.5 +
-  * tensorflow
+  * tensorflow (tensorflow-gpu)
     * GPU support is preferable for predictions and essential for training
     * developed under 1.8.0, use legacy version
     * compatible with latest version 1.14.0, use current version
     * the legacy versions should work with every tf version 1.8.0 or higher bearing with deprecation warnings
+    * the code was not yet tested on tensorflow 2
   * additional python modules:
     * numpy (v1.16.4 or above)
     * pysam (v 0.15.2)
     * pybedtools and a compatible version of bedtools installed
-  
+
   * R version 3.4.4 +
     * packages:
       * tidyverse (v1.2.1 or above)
       * RColorBrewer (v1.1-2 or above)
       * cowplot (v0.9.2 or above)
       * for plotting 1D tracks (e.g. DNase, ChIP-seq) rtracklayer rtracklayer (v1.38.3 or above) and dependencies are required
+    * Rstudio (not required but recommended)
 
   * some processing helper scripts require perl (v5.26.0 or above)
 
@@ -39,7 +44,8 @@ A Tensorflow DL framework for predicting Hi-C chromatin interactions using megab
 
 ### Installation
 
-Clone the repository. In python script, import from directory as `import deepCregr`.
+Clone the repository. Make sure all dependencies are available.
+To use from within a python script import as `import deepCregr`.
 
 ### Tutorials
 
