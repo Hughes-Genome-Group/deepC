@@ -1,4 +1,6 @@
-"""Trains and Evaluates deepCregr networks using a feed dictionary."""
+"""Trains and Evaluates deepCregr network.
+"""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -8,25 +10,31 @@ import time
 import sys
 
 import numpy as np
-import tensorflow as tf
 import pysam
 
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+
 import deepCregr
+
 
 # Basic model parameters as external flags -------------------------------------
 flags = tf.app.flags
 FLAGS = flags.FLAGS
+
+#flags.DEFINE_boolean('help', False, 'For help.')
+
 flags.DEFINE_string('data_file', '', 'Input data: pseudo bed format: chr start end and comma separated classes')
+
 # TRAININGS SETTINGS
 flags.DEFINE_string('test_chroms', 'chr12, chr13', 'Comma seperated list of test chromosoems to use ...')
 flags.DEFINE_string('validation_chroms', 'chr16, chr17', 'Comma seperated list of validation chromosoems to use ...')
-
 # flags.DEFINE_float('learning_rate_decay_steps', 5000, 'Steps to parameterize the exponential learning rate decay: LR will be LR * 0.96 every X steps.')
 flags.DEFINE_integer('max_epoch', 2, 'Number of epoch through train data to run trainer.')
 flags.DEFINE_integer('max_chroms', 18, 'Max number of training chromosomes to run through.')
 flags.DEFINE_integer('save_every_chrom', 6, 'Save every X\'th chromosome.')
 flags.DEFINE_float('keep_prob_inner', 0.8, 'Keep probability for dropout')
-flags.DEFINE_float('keep_prob_outer', 0.8, 'Keep probability for dropout. LEgacy Option not used in current model implementation.')
+flags.DEFINE_float('keep_prob_outer', 0.8, 'Keep probability for dropout. LEGACY Option not used in current model implementation.')
 flags.DEFINE_integer('batch_size', 1, 'Batch size.')
 flags.DEFINE_float('l2_strength', 0.0001, 'L2 regularization strength.')
 flags.DEFINE_boolean('shuffle', True, 'If to shuffle the trainset at the start of each epoch.')
@@ -72,6 +80,9 @@ flags.DEFINE_integer('bp_context', 1000000, 'Number of classes to classify. Defa
 flags.DEFINE_integer('num_classes', 50, 'Number of classes to classify. Default 182.')
 BP_CONTEXT = FLAGS.bp_context
 NUM_CLASSES = FLAGS.num_classes
+
+#if FLAGS.help:
+#    print(FLAGS.__dict__['__flags'])
 
 # SET RANDOM SEED --------------------------------------------------------------
 np.random.seed(FLAGS.seed)  # use same seed for numpy --> for shuffeling

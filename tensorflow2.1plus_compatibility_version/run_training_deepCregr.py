@@ -10,16 +10,22 @@ import time
 import sys
 
 import numpy as np
-import tensorflow as tf
 import pysam
 
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+
 import deepCregr
+
 
 # Basic model parameters as external flags -------------------------------------
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('help', False, 'For help.')
+
+#flags.DEFINE_boolean('help', False, 'For help.')
+
 flags.DEFINE_string('data_file', '', 'Input data: pseudo bed format: chr start end and comma separated classes')
+
 # TRAININGS SETTINGS
 flags.DEFINE_string('test_chroms', 'chr12, chr13', 'Comma seperated list of test chromosoems to use ...')
 flags.DEFINE_string('validation_chroms', 'chr16, chr17', 'Comma seperated list of validation chromosoems to use ...')
@@ -75,11 +81,10 @@ flags.DEFINE_integer('num_classes', 50, 'Number of classes to classify. Default 
 BP_CONTEXT = FLAGS.bp_context
 NUM_CLASSES = FLAGS.num_classes
 
-if FLAGS.help:
-    print(FLAGS.__dict__['__flags'])
+#if FLAGS.help:
+#    print(FLAGS.__dict__['__flags'])
 
 # SET RANDOM SEED --------------------------------------------------------------
-tf.compat.v1.set_random_seed(FLAGS.seed)
 np.random.seed(FLAGS.seed)  # use same seed for numpy --> for shuffeling
 
 # Process/Prepare Train Test Valid Options ---------------------------------------
@@ -593,6 +598,9 @@ def run_training():
 
   # Tell TensorFlow that the model will be built into the default Graph.
   with tf.Graph().as_default():
+
+    # set seed
+    tf.compat.v1.set_random_seed(FLAGS.seed)
 
     # Generate placeholders for the seqs and labels (and dropout prob).
     seqs_placeholder, labels_placeholder = placeholder_inputs(FLAGS.batch_size, FLAGS.store_dtype)
