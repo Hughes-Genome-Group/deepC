@@ -17,13 +17,9 @@ and deepC predictions.
   * python 3.5 +
   * tensorflow (tensorflow-gpu)
     * GPU support is preferable for predictions and essential for training
-    * developed under 1.8.0, use legacy version
-    * compatible with latest version 1.14.0, use current version
-    * the legacy versions should work with every tf version 1.8.0 or higher bearing with deprecation warnings
-    * the code was not yet tested on tensorflow 2
   * additional python modules:
     * numpy (v1.16.4 or above)
-    * pysam (v 0.15.2)
+    * pysam (tested with v0.15.2)
     * pybedtools and a compatible version of bedtools installed
 
   * R version 3.4.4 +
@@ -35,6 +31,32 @@ and deepC predictions.
     * Rstudio (not required but recommended)
 
   * some processing helper scripts require perl (v5.26.0 or above)
+
+### Installation
+
+* Make sure python 3.5-3.7 as supported by tensorflow is installed.
+
+* Install [tensorflow](https://www.tensorflow.org/install) preferably with [GPU support](https://www.tensorflow.org/install/gpu).
+  * We recommend tensorflow 2.1 but deepC was developed under v1.8 and supports (v1.8, 1.14 and 2.1 other versions have not been tested).
+  * The tensorflow docker containers are the easiest way to set up tensorflow with GPU and come with the correct CUDA and cuDNN versions packaged.
+  * If installing CUDA, cuDNN and tensorflow separately make sure to follow the [compatibility advice](https://www.tensorflow.org/install/source#linux)
+  * To install an older version e.g. tensorflow 1 follow [this route](https://www.tensorflow.org/install/pip)
+
+* Install additional python library (pysam and pybedtools) using e.g. pip or bioconda
+  * `pip install pybedtools`
+  * `pip install pysam`
+
+* Clone the **deepC** github repository
+* Check which version of tensorflow you have installed and choose the apropriate compatibility version of deepC
+
+| tensorflow version |  CUDA version | deepC version  |
+| ------------------ |:-------------:| --------------:|
+| 2.1+               | 10.1          | [tensorflow2.1plus_compatibility_version](./tensorflow2.1plus_compatibility_version) |
+| 2.0               | 10          | [tensorflow2.0_compatibility_version](./tensorflow2.0_compatibility_version)* |
+| 1.14               | 10          | [tensorflow1_version](./tensorflow1_version) |
+| 1.8               | 9          | [legacy_version_tf1.8](./legacy_version_tf1.8) |
+
+*Compatibility with v2.0 not yet tested.
 
 ### Required Ressources
 

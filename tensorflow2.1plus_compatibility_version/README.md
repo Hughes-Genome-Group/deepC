@@ -4,8 +4,8 @@
 
 ### Description
 
-Tensorflow 2+ compativility version of deepC. Adapted from the 1.8.0 version. Runs in Tensoflow2 (2.0 and 2.1 with CUDA 10.0 and 10.1 respectively).
-The code is only adapted to load in tf1 compatibility mode. A reimplementation of in tensorflow2 is to follow.
+Tensorflow 2.1+ compatibility version of deepC. Adapted from the 1.8.0 version. Runs in Tensoflow2 (2.1+ with CUDA 10.1).
+The code is only adapted to load in tf1 compatibility mode. We are working on a reimplementation in tensorflow2 style.
 
 ### Content
 

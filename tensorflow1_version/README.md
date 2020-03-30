@@ -4,7 +4,7 @@
 
 ### Description
 
-Tensorflow 1.14.0 implementation of deepC. Adapted from the 1.8.0 version for user friendliness.
+Tensorflow 1.14.0 / 1.15.0 implementation of deepC. Adapted from the 1.8.0 version for user friendliness.
 
 ### Content
 
@@ -21,7 +21,7 @@ in a tab separated file with bed 0-based coordinate encoding, *replacer* being t
 
 * **run_deploy_shape_combination_deepCregr.py** same as above but applies all variants listed in the input file to the sequence before running the prediction. For multiple variants.
 
-* **run_get_saliency.py** script for calculating the saliency with respect to input. 
+* **run_get_saliency.py** script for calculating the saliency with respect to input.
 
 
 ### Note

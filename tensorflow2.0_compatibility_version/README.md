@@ -4,13 +4,11 @@
 
 ### Description
 
-Tensorflow 2.0 compatibility version of deepC. Adapted from the 1.8.0 version. Runs in Tensoflow2 (2.0 and 2.1 with CUDA 10.0 and 10.1 respectively).
+Tensorflow 2.0 compatibility version of deepC. Adapted from the 1.8.0 version. Runs in Tensoflow2 (2.1 with CUDA 10.0).
 
-If you have Tensorflow 2.1 with CUDA 10.1 installed used the tensorflow 2 compatibility version. This version only covers to tensorflow 2.0 as the backwards compatibility has syntax variations. 
+If you have Tensorflow 2.1 with CUDA 10.1 installed used the tensorflow 2 compatibility version. This version only covers to tensorflow 2.0 as the backwards compatibility has syntax variations.
 
-The code is only adapted to load in tf1 compatibility mode. A reimplementation of in tensorflow2 is to follow.
-
-
+The code is only adapted to load in tf1 compatibility mode.
 
 ### Content
 
