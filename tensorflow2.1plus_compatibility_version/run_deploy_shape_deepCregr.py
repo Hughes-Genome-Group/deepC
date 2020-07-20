@@ -241,9 +241,9 @@ with tf.compat.v1.Session(config = config) as sess:
 
             # round new coordinates to full bins and set sequence window to extract -----
             # add 990,000 bp to either side of the last bin start / endpool
-            patch_start = customfloor(start, FLAGS.bin_size) - (FLAGS.add_window) - half_bp_context
-            patch_end = customceil(end, FLAGS.bin_size) + (FLAGS.add_window) + half_bp_context
-            patch_new_end = customceil(end, FLAGS.bin_size) + length_difference + (FLAGS.add_window) + half_bp_context
+            patch_start = customfloor(start, FLAGS.bin_size) - (FLAGS.add_window) - half_bp_context - half_bin_size
+            patch_end = customceil(end, FLAGS.bin_size) + (FLAGS.add_window) + half_bp_context + half_bin_size
+            patch_new_end = customceil(end, FLAGS.bin_size) + length_difference + (FLAGS.add_window) + half_bp_context + half_bin_size
 
             # check start and end of range
             # set start_diff if sequence to query is over the chromosome ends --> ready to padd
@@ -343,7 +343,7 @@ with tf.compat.v1.Session(config = config) as sess:
             with open(outfile_name, "w") as fw:
                 fw.write('# Variant Queried: %s' % line.rstrip())
                 fw.write('\n')
-                fw.write('# Mapping to relative reference coordinates: %s %s %s' % (chrom, (patch_start + half_bp_context), (patch_end - half_bp_context)))
+                fw.write('# Mapping to relative reference coordinates: %s %s %s' % (chrom, (patch_start + half_bp_context - half_bin_size), (patch_end - half_bp_context - half_bin_size)))
                 fw.write('\n')
                 fw.write('# Bp to adjust after Variant: %s' % length_difference)
                 fw.write('\n')

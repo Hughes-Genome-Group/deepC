@@ -222,7 +222,7 @@ with tf.Session(config = config) as sess:
 
         # get first desired sequence start (start add_window and half_bp_context)
         seq_start = min(starts) - FLAGS.add_window - half_bp_context
-        seq_start = customfloor(seq_start, base=10000)
+        seq_start = customfloor(seq_start, base=FLAGS.bin_size)
 
         if seq_start < 0:
             to_padd = abs(seq_start)
@@ -233,7 +233,7 @@ with tf.Session(config = config) as sess:
         # get end of desired sequence (add total_bp_difference to end up at bin_size divsible number
         seq_end = max(ends) + FLAGS.add_window + half_bp_context
         print(seq_end)
-        seq_end = customceil(seq_end, base = 10000)
+        seq_end = customceil(seq_end, base = FLAGS.bin_size)
         print(seq_end)
         seq_end += total_bp_difference
         print(seq_end)
