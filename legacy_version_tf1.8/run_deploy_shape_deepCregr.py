@@ -228,6 +228,7 @@ with tf.Session(config = config) as sess:
 
             # round new coordinates to full bins and set sequence window to extract -----
             # add 990,000 bp to either side of the last bin start / endpool
+            # TODO change extract mode HERE!!!!
             patch_start = customfloor(start, FLAGS.bin_size) - (FLAGS.add_window) - half_bp_context
             patch_end = customceil(end, FLAGS.bin_size) + (FLAGS.add_window) + half_bp_context
             patch_new_end = customceil(end, FLAGS.bin_size) + length_difference + (FLAGS.add_window) + half_bp_context
