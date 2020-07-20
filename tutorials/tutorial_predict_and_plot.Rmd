@@ -7,17 +7,14 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/data_local/deepC_write_tutorials_offline/run_deepc_tutorial/")
 
 library(reticulate)
 
-use_condaenv("tensorflow14", required = T)
+# use_condaenv("tensorflow14", required = T)
 
-```
-
-
-```{r, include=FALSE}
-
-setwd("~/Data/machine_learning/deepC_write_tutorials_offline/run_deepc_tutorial/")
+# need to run in console as workaround
+setwd("~/data_local/deepC_write_tutorials_offline/run_deepc_tutorial/")
 
 ```
 
@@ -46,6 +43,7 @@ Load packages and source custom functions for deepC and general HiC processing a
 ```{r packages, message=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(RColorBrewer)
 
 source("../deepC/helper_for_preprocessing_and_analysis/functions_for_HiC.R")
@@ -99,7 +97,7 @@ Note: Example output files are already provided with the deepC github repository
 # Run in bash
 
 # explanation
-python ../deepC/current_version/run_deploy_shape_deepCregr.py --input example_region_short.bed \  # input deepC variant bed-like file
+python ../tensorflow1_version/run_deploy_shape_deepCregr.py --input example_region_short.bed \  # input deepC variant bed-like file
   --out_dir ./test_predict_out \  #output directory
   --name_tag predict \  # name tag to add to ouput files
   --model ./model_deepCregr_5kb_GM12878_primary/model \  # trained deepC model downloaded and extracted
@@ -111,7 +109,7 @@ python ../deepC/current_version/run_deploy_shape_deepCregr.py --input example_re
   --run_on gpu  # specify to run on gpu or cpu (cpu takes significantly longer)
   
 # actually run
-python ../deepC/current_version/run_deploy_shape_deepCregr.py --input example_region_short.bed \
+python ../tensorflow1_version/run_deploy_shape_deepCregr.py --input example_region_short.bed \
   --out_dir ./test_predict_out \
   --name_tag predict \
   --model ./model_deepCregr_5kb_GM12878_primary/model \
@@ -126,10 +124,10 @@ python ../deepC/current_version/run_deploy_shape_deepCregr.py --input example_re
 
 Having a look at the output format. The variant file (also called so for reference predictions) is a tab separated file: chr start end pred_bin_1 pred_bin_2 ....
 
-The coordinates specify the sequence window (1Mb + bin size) centered on this are the vertical pole interaction predictions moving from close to diagonal to distal interactions. The coordinates refer to the center of a bin.sized bin. Get the center bin the predictions map to by calculating the center of this window. Subtract bin.size/2 to get left most base pair bin specification.
+The coordinates specify the sequence window (1Mb + bin size) centered on this are the vertical pole interaction predictions moving from close to diagonal to distal interactions. The coordinates refer to the center of a bin.sized bin. Get the center bin the predictions map to by calculating the center of this window (-half bin size to get the left most coordinate of the middle bin).
 
 The predictions are regression values corresponding to the HiC skeleton.
-The header files list the reference or variant region and where they map to in the reference genome. They also specify if any bp shifts occured due to differences between reference and variant length.
+The header files list the reference or variant region and where they map to in the reference genome. (#Mapping to relative reference coordinates:) which refers to  the first and last bin over which the vertical interaction pole is predicted. They also specify if any bp shifts occured due to differences between reference and variant length.
 This is obviously not relevant for reference predictions.
 We can concatinate multiple reference predictions files to combine bigger regions or whole chromosome predictions in a single file. To do this just concatinate, remove header lines (grep -v "#") and sort (if not concatinated in order).
 
@@ -287,7 +285,8 @@ binned.genome <- binned.genome %>%
 
 # format HiC data into deepC vertical pole distance bin data frame format
 # link to the helper perl script in your deepC repository copy
-hic.df <- getZigZagWindowInteractionsPerl(hic, binned.genome, window.size, bin.size, query.pl = "../deepC/helper_for_preprocessing_and_analysis/match_query_table.pl")
+hic.df <- getZigZagWindowInteractionsPerl(hic, binned.genome, window.size, bin.size, query.pl =
+  "../deepC/helper_for_preprocessing_and_analysis/match_query_table.pl")
 hic.df <- as.tibble(hic.df)
 
 # to visualize hic data we add a position column and gather
@@ -397,7 +396,7 @@ We go ahead and delete the example variant sequence as provided. We run the deep
 
 ```{bash, eval=FALSE}
 # Run in terminal
-python ../deepC/current_version/run_deploy_shape_deepCregr.py --input example_variant.bed \
+python ../tensorflow1_version/run_deploy_shape_deepCregr.py --input example_variant.bed \
   --out_dir ./test_variant_out \
   --name_tag predict_variant \
   --model ./model_deepCregr_5kb_GM12878_primary/model \
