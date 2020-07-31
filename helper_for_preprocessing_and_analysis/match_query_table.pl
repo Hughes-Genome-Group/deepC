@@ -25,9 +25,9 @@ open(HI, $hic_in) or die "Can't open HiC input matrix $hic_in $!\n";
       $l = $x;
       $r = $y;
     }
-    # # adjust to leftmost bin notation ### IS THAT CORRECT?!
-    # $l -= $binsize/2;
-    # $r -= $binsize/2;
+    # adjust to leftmost bin notation 
+    $l -= $binsize/2;
+    $r -= $binsize/2;
 
     my $tag = "$l:$r";
 

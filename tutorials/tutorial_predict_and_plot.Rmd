@@ -265,7 +265,9 @@ start.pos <- hic$start.pos - bin.size/2
 # to map the hic data into consistent bins for deepC training, prediction and plotting we create get a binned genome template
 # this requires bedtools to be installed as the R function calls bedtools in the background in bash
 # add at least the bp_context window.size to the region of interest coordinates
-binned.genome <- getBinnedChrom(chr="chr17", start=limit1-window.size, end=limit2+window.size, window=window.size, step=bin.size)
+# make sure the start and end position match to the binning of the Hi-C data
+# use custom floor/ceiling funcitons for your bin size
+binned.genome <- getBinnedChrom(chr="chr17", start=custom_floor(limit1-window.size, bin.size), end=custom_ceil(limit2+window.size, bin.size), window=window.size, step=bin.size)
 binned.genome <- as.tibble(binned.genome)
 names(binned.genome) <- c("chr", "start", "end")
 
