@@ -18,9 +18,16 @@ visualization and analysis.
 and helper for analysing and visualizing deepC predictions e.g.:
   compare reference vs. variant predictions
   * virtual4C
-* `functions_for_HiC.R` - general helper functions for loading, processing and visualizing Hi-C data (copy from [here](https://github.com/rschwess/RonsUtilityBox/))
-* `match_query_table.pl` - helper perl script for
+* `functions_for_HiC.R` - general helper functions for loading, processing and visualising Hi-C data (copy from [here](https://github.com/rschwess/RonsUtilityBox/))
+* [reference_manual](./reference_manual_deepC_R_utility.pdf) detailing all available functions.
+* `match_query_table.pl` - helper perl script for processing Hi-C data
+* `match_query_table.pl` - helper perl script for processing Hi-C data
 
-### Tutorials
 
-Assembling tutorial scripts for processing Hi-C data for deepC training and examples for utilization.
+### Notes
+
+Some R functions require a working version of bedtools being installed and available in your standard path as queried from within R. Uses "bedtools makewindows".
+
+Some R functions require a working version of perl being installed and available in your standard path as queried from within R.
+
+Requires a recent version of "tidyverse" and "RColorBrewer".
