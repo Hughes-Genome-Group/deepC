@@ -74,6 +74,7 @@ seed_file='./saved_conv_weights_dhw_5layer_1k_pool.npz' #trained filters phase I
 shuffle=True
 store_dtype='bool'  # how to store the sequence
 whg_fasta='./hg19.fa'  # link to whole genome fasta file for retrieving the sequences has to be indexed
+use_softmasked=False  # specify if to use soft masked bases from the fasta file (lowercase). Default=False
 
 # if multiple GPUs present select a single one to run training on
 # and not block the remaining
@@ -111,6 +112,7 @@ python ${SCRIPT_PATH}/run_training_deepCregr.py \
         --shuffle=${shuffle} \
         --store_dtype ${store_dtype} \
         --whg_fasta ${whg_fasta} \
+        --use_softmasked=${use_softmasked} \
         --gpu ${GPU}
 
 ```

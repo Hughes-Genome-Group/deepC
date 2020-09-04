@@ -102,6 +102,7 @@ python ../tensorflow1_version/run_deploy_shape_deepCregr.py --input example_regi
   --name_tag predict \  # name tag to add to ouput files
   --model ./model_deepCregr_5kb_GM12878_primary/model \  # trained deepC model downloaded and extracted
   --genome ./hg19_chr17_fasta_for_test/hg19_chr17.fa \  # link to whole genome or chromosome wise fasta file (needs a fasta index) or test chr17 fasta file dowloaded and extracted
+  --use_softmasked=False \  #Specify if to include base pairs soft masked in the fasta file (lower case) default=False
   --bp_context 1005000 \  # bp context (1 Mb + bin.size)
   --add_window 500000 \  # how much bp to add to either side of the specified window
   --num_classes 201 \  # The number of classes corresponds to the number of outputs (output bins of the vertical pole) (201 for 5kb models; 101 for 10kb models)
@@ -114,6 +115,7 @@ python ../tensorflow1_version/run_deploy_shape_deepCregr.py --input example_regi
   --name_tag predict \
   --model ./model_deepCregr_5kb_GM12878_primary/model \
   --genome ./hg19_chr17_fasta_for_test/hg19_chr17.fa  \
+  --use_softmasked=False  \
   --bp_context 1005000 \
   --add_window 500000 \
   --num_classes 201 \
