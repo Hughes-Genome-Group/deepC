@@ -65,6 +65,7 @@ flags.DEFINE_integer('report_every', 100, 'Set interval of batch steps o when to
 flags.DEFINE_string('store_dtype', 'bool', 'Indicate that sequence where stored as bools rather then integers. Will convert automatically.')
 # Whole genome fasta file for accessing genome sequences
 flags.DEFINE_string('whg_fasta', None, 'Path to whole genome fasta file for reading the genomic sequence')
+flags.DEFINE_boolean('use_softmasked', False, 'Include soft masked sequences (lower case). If False will set them to Ns. Default = False')
 flags.DEFINE_integer('seed', 1234, 'Random seed for tensorflow (graph level).')
 
 # GLOBAL Options ---------------------------------------------------------------
@@ -169,10 +170,15 @@ def load_chromosomes(genome_file):
 
   return(chrom_segments)
 
-def get_hot_coded_seq(sequence, dtype="int32"):
+def get_hot_coded_seq(sequence, use_soft=False, dtype="int32"):
     """Convert a 4 base letter sequence to 4-row x-cols hot coded sequence"""
     # initialise empty
     hotsequence = np.zeros((len(sequence),4), dtype=dtype)
+
+    # transform to uppercase if using softmasked sequences
+    if use_soft:
+        sequence = sequence.upper()
+
     # set hot code 1 according to gathered sequence
     for i in range(len(sequence)):
         if sequence[i] == 'A':
@@ -183,12 +189,18 @@ def get_hot_coded_seq(sequence, dtype="int32"):
             hotsequence[i,2] = 1
         elif sequence[i] == 'T':
             hotsequence[i,3] = 1
+
     # return the numpy array
     return hotsequence
-def get_hot_coded_seq_bool(sequence):
+def get_hot_coded_seq_bool(sequence, use_soft=False):
     """Convert a 4 base letter sequence to 4-row x-cols hot coded sequence"""
     # initialise empty
     hotsequence = np.zeros((len(sequence),4), dtype='bool')
+
+    # transform to uppercase if using softmasked sequences
+    if use_soft:
+        sequence = sequence.upper()
+
     # set hot code 1 according to gathered sequence
     for i in range(len(sequence)):
         if sequence[i] == 'A':
@@ -312,11 +324,11 @@ def get_chr_seq(whg_fasta, chromosome, dtype = "uint8"):
         seq = fa.fetch(reference = chromosome)
         # convert to one hot encoding
         if dtype == 'bool':
-            seq = get_hot_coded_seq_bool(seq)
+            seq = get_hot_coded_seq_bool(seq, use_soft=FLAGS.use_softmasked)
         elif dtype == 'uint8':
-            seq = get_hot_coded_seq(seq, dtype)
+            seq = get_hot_coded_seq(seq, use_soft=FLAGS.use_softmasked, dtype = dtype)
         else:
-            seq = get_hot_coded_seq(seq, dtype)
+            seq = get_hot_coded_seq(seq, use_soft=FLAGS.use_softmasked, dtype = dtype)
     return(seq)
 def fill_seqs(chr_seq, positions_stored, indeces, batch_size, seq_length, dtype = "uint8"):
     # init

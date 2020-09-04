@@ -76,6 +76,7 @@ flags.DEFINE_integer('add_window', 0, 'Basepairs to add around variant of intere
 flags.DEFINE_integer('num_classes', 101, 'Number of classes.')
 flags.DEFINE_integer('bin_size', 10000, 'Bin size to apply when running over the new sequence.')
 flags.DEFINE_string('store_dtype', 'float32', 'Indicate that sequence where stored as bools rather then integers. Will convert automatically.')
+flags.DEFINE_boolean('use_softmasked', False, 'Include soft masked sequences (lower case). If False will set them to Ns. Default = False')
 
 # machine options
 flags.DEFINE_string('run_on', 'gpu', 'Select where to run on (cpu or gpu)')
@@ -135,10 +136,15 @@ def placeholder_inputs(batch_size, dtype):
     return seqs_placeholder, labels_placeholder
 
 # Helper get hotcoded sequence
-def get_hot_coded_seq(sequence):
+def get_hot_coded_seq(sequence, use_soft=False):
     """Convert a 4 base letter sequence to 4-row x-cols hot coded sequence"""
     # initialise empty
-    hotsequence = np.zeros((len(sequence),4), dtype='float')
+    hotsequence = np.zeros((len(sequence),4), dtype=dtype)
+
+    # transform to uppercase if using softmasked sequences
+    if use_soft:
+        sequence = sequence.upper()
+
     # set hot code 1 according to gathered sequence
     for i in range(len(sequence)):
         if sequence[i] == 'A':
@@ -149,8 +155,10 @@ def get_hot_coded_seq(sequence):
             hotsequence[i,2] = 1
         elif sequence[i] == 'T':
             hotsequence[i,3] = 1
+
     # return the numpy array
     return hotsequence
+
 
 def map_saliency(sess,
     saliency_op,
@@ -402,7 +410,7 @@ with tf.Graph().as_default():
                 # make hotcoded sequences
                 hotseqs = []
                 for seq in run_seqs:
-                    seq = get_hot_coded_seq(seq)  # hot encode
+                    seq = get_hot_coded_seq(seq, use_soft=FLAGS.use_softmasked)  # hot encode
                     hotseqs.append(seq)
                 hotseqs = np.asarray(hotseqs)
 
