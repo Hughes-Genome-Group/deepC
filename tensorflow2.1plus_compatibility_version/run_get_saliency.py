@@ -141,7 +141,7 @@ def placeholder_inputs(batch_size, dtype):
 def get_hot_coded_seq(sequence, use_soft=False):
     """Convert a 4 base letter sequence to 4-row x-cols hot coded sequence"""
     # initialise empty
-    hotsequence = np.zeros((len(sequence),4))
+    hotsequence = np.zeros((len(sequence),4), dtype = 'uint8')
 
     # transform to uppercase if using softmasked sequences
     if use_soft:
