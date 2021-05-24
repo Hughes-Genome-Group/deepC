@@ -18,7 +18,7 @@ import deepCregr
 # Basic model parameters as external flags -------------------------------------
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('help', False, 'For help.')
+# flags.DEFINE_boolean('help', False, 'For help.')
 flags.DEFINE_string('data_file', '', 'Input data: pseudo bed format: chr start end and comma separated classes')
 # TRAININGS SETTINGS
 flags.DEFINE_string('test_chroms', 'chr12, chr13', 'Comma seperated list of test chromosoems to use ...')
@@ -76,8 +76,8 @@ flags.DEFINE_integer('num_classes', 50, 'Number of classes to classify. Default 
 BP_CONTEXT = FLAGS.bp_context
 NUM_CLASSES = FLAGS.num_classes
 
-if FLAGS.help:
-    print(FLAGS.__dict__['__flags'])
+# if FLAGS.help:
+#     print(FLAGS.__dict__['__flags'])
 
 # SET RANDOM SEED --------------------------------------------------------------
 np.random.seed(FLAGS.seed)  # use same seed for numpy --> for shuffeling

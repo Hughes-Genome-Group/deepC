@@ -22,8 +22,6 @@ import deepCregr
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-#flags.DEFINE_boolean('help', False, 'For help.')
-
 flags.DEFINE_string('data_file', '', 'Input data: pseudo bed format: chr start end and comma separated classes')
 
 # TRAININGS SETTINGS
@@ -81,9 +79,6 @@ flags.DEFINE_boolean('use_softmasked', False, 'Include soft masked sequences (lo
 flags.DEFINE_integer('num_classes', 50, 'Number of classes to classify. Default 182.')
 BP_CONTEXT = FLAGS.bp_context
 NUM_CLASSES = FLAGS.num_classes
-
-#if FLAGS.help:
-#    print(FLAGS.__dict__['__flags'])
 
 # SET RANDOM SEED --------------------------------------------------------------
 np.random.seed(FLAGS.seed)  # use same seed for numpy --> for shuffeling

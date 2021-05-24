@@ -183,7 +183,7 @@ def map_saliency(sess,
         test_batch_end = step * FLAGS.batch_size + FLAGS.batch_size
         test_batch_range=range(test_batch_start, test_batch_end)
         feed_dict = {
-              seqs_placeholder: np.expand_dims(seqs[test_batch_range][0], axis=0),
+              seqs_placeholder: seqs[test_batch_range],
               keep_prob_inner_placeholder: 1.0,
               keep_prob_outer_placeholder: 1.0
               }

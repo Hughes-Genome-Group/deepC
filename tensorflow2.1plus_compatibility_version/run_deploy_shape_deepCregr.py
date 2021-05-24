@@ -320,9 +320,12 @@ with tf.compat.v1.Session(config = config) as sess:
                     js = patch_start + i * half_bin_size
                     je = patch_start + i * half_bin_size + FLAGS.bp_context
                     jseq = seq[(i*half_bin_size):((i)*half_bin_size + FLAGS.bp_context)]
-                    run_starts.append(js)
-                    run_ends.append(je)
-                    run_seqs.append(jseq)
+                    if len(jseq) == FLAGS.bp_context:
+                        run_starts.append(js)
+                        run_ends.append(je)
+                        run_seqs.append(jseq)
+                    else:
+                        print('Extracted seq for %s-%s is smaller then bp_context ... skipping' % (js, je))
                     i += 1
 
             # Predict ----------------------------------------------------------------
