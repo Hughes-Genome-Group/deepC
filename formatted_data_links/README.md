@@ -11,7 +11,7 @@ Coming soon ...
 
 ### Links
 
-* example HiC [skeleton](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/data_links/example_skeleton_gm12878_5kb_chr17.bed) chr17 5kb GM12878 primary
+* example HiC [skeleton](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/example_skeleton_gm12878_5kb_chr17.bed) chr17 5kb GM12878 primary
 
 * example GM12878 [HiC sparse matrix](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/data_links/gm12878_primary_chr17_5kb.contacts.KRnorm.matrix.gz) KRnorm (Rao et al.)
 
