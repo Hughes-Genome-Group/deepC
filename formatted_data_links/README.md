@@ -13,10 +13,10 @@ Coming soon ...
 
 * example HiC [skeleton](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/example_skeleton_gm12878_5kb_chr17.bed) chr17 5kb GM12878 primary
 
-* example GM12878 [HiC sparse matrix](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/data_links/gm12878_primary_chr17_5kb.contacts.KRnorm.matrix.gz) KRnorm (Rao et al.)
+* example GM12878 [HiC sparse matrix](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/gm12878_primary_chr17_5kb.contacts.KRnorm.matrix.gz) KRnorm (Rao et al.)
 
-* [formatted data](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/data_links/data_GM12878_5kb_regression.txt.tar.gz) ready for deepC training (also see `./data_links`)
+* [formatted data](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/data_GM12878_5kb_regression.txt.tar.gz) ready for deepC training (also see `./data_links`)
 
-* [hg19 chr17](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/data_links/hg19_chr17_fasta_for_test.tar.gz) fasta and index for tutorial
+* [hg19 chr17](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/hg19_chr17_fasta_for_test.tar.gz) fasta and index for tutorial
 
-* example [DNase-seq](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/data_links/dnase_gm12878_encode_uw_merged_w50.bw) and [CTCF ChIP-seq](http://userweb.molbiol.ox.ac.uk/public/rschwess/deepC/data_links/ctcf_gm12878_encode_broad_merged_w50.bw) bigwig tracks from ENCODE for tutorial
+* example [DNase-seq](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/dnase_gm12878_encode_uw_merged_w50.bw) and [CTCF ChIP-seq](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/ctcf_gm12878_encode_broad_merged_w50.bw) bigwig tracks from ENCODE for tutorial
