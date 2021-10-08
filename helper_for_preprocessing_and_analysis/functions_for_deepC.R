@@ -70,7 +70,7 @@ readDeepcVariantFile <- function(file, prediction.bins = 101, bin.size = 10000, 
   relative.end <- as.numeric(header.2[9])
   bp.adjust <- as.numeric(header.3[7])
   # 3) load variant dataframe
-  df <- as.tibble(read.table(file, header = F, skip = 3))
+  df <- as_tibble(read.table(file, header = F, skip = 3))
   if(tag.col == TRUE){
     names(df) <- c("chr", "start", "end", "tag", c(1:prediction.bins))
     df <- df %>% select(-tag)
@@ -123,7 +123,7 @@ readDeepcVariantFile <- function(file, prediction.bins = 101, bin.size = 10000, 
 readDeepcVariantFileNoHeader <- function(file, prediction.bins = 101, bin.size = 10000, gather=TRUE, tag.col = FALSE, zigzag = TRUE){
 
   # 1) load variant dataframe
-  df <- as.tibble(read.table(file, header = F))
+  df <- as_tibble(read.table(file, header = F))
   if(tag.col == TRUE){
     names(df) <- c("chr", "start", "end", "tag", c(1:prediction.bins))
     df <- df %>% select(-tag)
@@ -165,7 +165,7 @@ readDeepcVariantFileNoHeader <- function(file, prediction.bins = 101, bin.size =
 #' @export
 readHicDataBins <- function(file, prediction.bins = 101, gather=TRUE){
 
-  sdf <- as.tibble(read.table(file))
+  sdf <- as_tibble(read.table(file))
   sdf$V4 <- as.character(sdf$V4)
   names(sdf) <- c("chr", "start", "end", "qbins")
 
@@ -184,7 +184,7 @@ readHicDataBins <- function(file, prediction.bins = 101, gather=TRUE){
   }
 
   # combine and gather for plotting
-  sdf <- as.tibble(cbind(df, mat))
+  sdf <- as_tibble(cbind(df, mat))
 
   #gather if specified
   if(gather == TRUE){
@@ -213,7 +213,7 @@ readHicDataBins <- function(file, prediction.bins = 101, gather=TRUE){
 readDeepcInputHicBed <- function(file, prediction.bins = 101, bin.size = 10000, gather=TRUE, zigzag = TRUE){
 
   # 1) load variant dataframe
-  sdf <- as.tibble(read.table(file, header = F))
+  sdf <- as_tibble(read.table(file, header = F))
   names(sdf) <- c("chr", "start", "end", "qbins")
   sdf$V4 <- as.character(sdf$qbins)
 
@@ -233,7 +233,7 @@ readDeepcInputHicBed <- function(file, prediction.bins = 101, bin.size = 10000, 
   }
 
   # combine and gather for plotting
-  sdf <- as.tibble(cbind(df, mat))
+  sdf <- as_tibble(cbind(df, mat))
   if(gather == TRUE){
     sdf <- sdf %>%
       gather(bin, value, -chr, -pos) %>%
@@ -643,10 +643,8 @@ trimHicRange <- function(hic.obj, range=1000000){
 
 #' getBinnedChrom
 #'
-#' helper function to get a binned genome using bedtools (requires bedtools available)
-#' Will Run bedtools on your default shell saving temporary files in your working directory.
-#' Create a binned genome data frame on the specified chromosome from start to end positions
-#' in window.sized bins and step sized steps. See "bedtools makewindows" which is the fucntion invoked.
+#' helper function to get a binned genome using bedtools 
+#' Create a binned genome data frame on the specified chromosome from start to end positions.
 #' @param chr chromosome
 #' @param start start position
 #' @param end end postion
@@ -661,25 +659,14 @@ trimHicRange <- function(hic.obj, range=1000000){
 #' }
 #' @export
 getBinnedChrom <- function(chr='chr1', start=0, end=10000, window=1000, step=500, timestamp = paste0(gsub("\\s+", "_", Sys.time()), "_", runif(n=1))){
-  # HELPER FUCNTION: get binned genome using bedtools (requires module load bedtools)
-
-  tempfile.for.bedtools.call <- paste0("tempfile_for_bedtools_call_", timestamp, ".bed")
-  tempfile.from.bedtools.call <- paste0("tempfile_from_bedtools_call_", timestamp, ".bed")
-
+  # HELPER FUCNTION: get binned genome 
+  
   # calc effective end point
   effective.end <- start + window * (floor((end - start)/window) + 1)
-  # write tempfile for bedtools
-  tdf <- data.frame(chr=chr, start=start, end=effective.end)
-  write.table(tdf, file=tempfile.for.bedtools.call, col.names=F, row.names = F, quote=F, sep="\t")
-  # use bedtools makewindows to make the bins
-  command.string <- paste0("bedtools makewindows -b ", tempfile.for.bedtools.call, "  -w ", format(window, scientific = F), "  -s ", format(step, scientific = F), " >", tempfile.from.bedtools.call)
-  print(command.string)
-  system(command.string)
-  # read back in
-  bg <- as.data.frame(read.table(tempfile.from.bedtools.call, header=F, colClasses=c("character", rep("numeric",2))))
-  # remove temp files
-  system(paste0("rm -f ", tempfile.for.bedtools.call, " ", tempfile.from.bedtools.call))
-
+  #start with end points
+  bg <- tibble(end = seq(start.pos + window, effective.end, step))
+  bg <- bg %>% mutate(start = end - window, chr = chr) %>% select(chr, start, end)
+  
   return(bg)
 }
 
@@ -770,7 +757,7 @@ getVerticalWindowInteractions <- function(hic.obj, bin.df, window, bin){
   cdf <- do.call("rbind", cdf)
   names(cdf)[c(4:(expected.values+3))] <- c(1:expected.values)
 
-  return(as.tibble(cdf))
+  return(as_tibble(cdf))
 
 }
 
@@ -930,7 +917,7 @@ getZigZagWindowInteractionsPerlMemoryFriendly <- function(hic.obj,
   print("matching ...")
   system(command, ignore.stdout = TRUE)
   # read back in match queried data tale as data frame
-  mdf <- as.tibble(read.table(temp.query.outfile, header=F, colClasses = c("character", rep("numeric",2+expected.values))))
+  mdf <- as_tibble(read.table(temp.query.outfile, header=F, colClasses = c("character", rep("numeric",2+expected.values))))
   # add names
   names(mdf) <- c("chr", "start", "end", c(1:expected.values))
 
@@ -1019,9 +1006,9 @@ pyramidBin <- function(df, return.means = FALSE){
   matq[matq == 20] <- 10
 
   # for every distance bin get mean values per quantile
-  df.mat <- as.tibble(mat)
+  df.mat <- as_tibble(mat)
   df.mat <- df.mat %>% gather(bin, value)
-  df.matq <- as.tibble(matq)
+  df.matq <- as_tibble(matq)
   df.matq <- df.matq %>% gather(bin, quant)
   df.mat$quant <- df.matq$quant  # bind
 
@@ -1248,9 +1235,9 @@ Sobeln <- function(profile){
 #   matq[matq == 20] <- 10
 #
 #   # for every distance bin get mean values per quantile
-#   df.mat <- as.tibble(mat)
+#   df.mat <- as_tibble(mat)
 #   df.mat <- df.mat %>% gather(bin, value)
-#   df.matq <- as.tibble(matq)
+#   df.matq <- as_tibble(matq)
 #   df.matq <- df.matq %>% gather(bin, quant)
 #   df.mat$quant <- df.matq$quant  # bind
 #
@@ -1278,7 +1265,7 @@ Sobeln <- function(profile){
 # # helper fucntion to read a bedtools deployment prediction file
 # readDeepcBedtoolFile <- function(file, chrom="chr16", prediction.bins = 101, gather = TRUE){
 #
-#   df <- as.tibble(read.table(file, header = F))
+#   df <- as_tibble(read.table(file, header = F))
 #   names(df) <- c("chr", "start", "end", "tag", c(1:prediction.bins))
 #
 #   if(gather == TRUE){
@@ -1295,7 +1282,7 @@ Sobeln <- function(profile){
 # # helper to read skeleton coordinate to bin files as data frame (tibble)
 # readSkeletonRegrBins <- function(file, prediction.bins = 50, gather=TRUE){
 #
-#   sdf <- as.tibble(read.table(file))
+#   sdf <- as_tibble(read.table(file))
 #   sdf$V4 <- as.character(sdf$V4)
 #   names(sdf) <- c("chr", "start", "end", "qbins")
 #
@@ -1314,7 +1301,7 @@ Sobeln <- function(profile){
 #   }
 #
 #   # combine and gather for plotting
-#   sdf <- as.tibble(cbind(df, mat))
+#   sdf <- as_tibble(cbind(df, mat))
 #
 #   #gather if specified
 #   if(gather == TRUE){
@@ -1371,4 +1358,48 @@ Sobeln <- function(profile){
 #   return(v4c.df)
 # }
 
+# old bedtools reliant getBinnedChrom ===========
+#' getBinnedChrom
+#' 
+#' helper function to get a binned genome using bedtools (requires bedtools
+#' available) Will Run bedtools on your default shell saving temporary files in
+#' your working directory. Create a binned genome data frame on the specified
+#' chromosome from start to end positions in window.sized bins and step sized
+#' steps. See "bedtools makewindows" which is the fucntion invoked.
+# @param chr chromosome
+# @param start start position
+# @param end end postion
+# @param window size of the window / bins
+# @param step The step size between windows/bins. The increment.
+# @param timestamp automatically produces a timestamp to uniquely identify
+#   temporary files defaut = paste0(gsub("\\s+", "_", Sys.time()), "_",
+#   runif(n=1))
+# @return data frame with genomic bins
+# @examples
+# \dontrun{
+# getBinnedChrom(chr='chr1', start=0, end=10000, window=1000, step=500)
+# }
+# @export
+# getBinnedChrom <- function(chr='chr1', start=0, end=10000, window=1000, step=500, timestamp = paste0(gsub("\\s+", "_", Sys.time()), "_", runif(n=1))){
+#   # HELPER FUCNTION: get binned genome using bedtools (requires module load bedtools)
+#   
+#   tempfile.for.bedtools.call <- paste0("tempfile_for_bedtools_call_", timestamp, ".bed")
+#   tempfile.from.bedtools.call <- paste0("tempfile_from_bedtools_call_", timestamp, ".bed")
+#   
+#   # calc effective end point
+#   effective.end <- start + window * (floor((end - start)/window) + 1)
+#   # write tempfile for bedtools
+#   tdf <- data.frame(chr=chr, start=start, end=effective.end)
+#   write.table(tdf, file=tempfile.for.bedtools.call, col.names=F, row.names = F, quote=F, sep="\t")
+#   # use bedtools makewindows to make the bins
+#   command.string <- paste0("bedtools makewindows -b ", tempfile.for.bedtools.call, "  -w ", format(window, scientific = F), "  -s ", format(step, scientific = F), " >", tempfile.from.bedtools.call)
+#   print(command.string)
+#   system(command.string)
+#   # read back in
+#   bg <- as.data.frame(read.table(tempfile.from.bedtools.call, header=F, colClasses=c("character", rep("numeric",2))))
+#   # remove temp files
+#   system(paste0("rm -f ", tempfile.for.bedtools.call, " ", tempfile.from.bedtools.call))
+#   
+#   return(bg)
+# }
 

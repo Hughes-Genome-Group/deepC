@@ -196,7 +196,7 @@ ImportHicproMatrix <- function(matrix, coords="empty", chr="empty", bin.size=0, 
     # make ids
     bin.ids <- bins/bin.size
     # convert to id coord dataframe
-    coords.in <- as.tibble(data.frame(
+    coords.in <- as_tibble(data.frame(
       chr = rep(chr, length(bins)),
       start = bins,
       end = bins + bin.size,
@@ -208,7 +208,7 @@ ImportHicproMatrix <- function(matrix, coords="empty", chr="empty", bin.size=0, 
 
   }else{
     #read and format coords
-    coords.in <- as.tibble(read.table(coords, header=FALSE))
+    coords.in <- as_tibble(read.table(coords, header=FALSE))
     colnames(coords.in) <- c("chr", "start", "end", "id")
     bin.size <- coords.in$end[1] - coords.in$start[1] # get bin size
   }
