@@ -5,7 +5,7 @@ Tutorials for the basic deepC workflows.
 
 -------------------------------------------------------------------------------
 
-### Description
+### Tutorials
 
 These tutorials follow the workflow we use for deepC predictions, analysis and visualizations.
 
@@ -15,14 +15,7 @@ The downstream analysis and visualizations is done within R using tidyverse and 
 
 The tutorials use the *current_version* scripts for tensorflow 1.14. If you are running on 1.8 just switch the script links to the legacy version.
 
-In addition, we wrote wrapper scripts that perform standard preprocessing and downstream visualization tasks for deepC from the command line. These are written in R, software and data requirements are outlined below.
-
-## Access
-
 Checkout the html files from your repo clone or download the html files. It has some plots that lead to a bigger file size so gitHub can't visualize it straight online. Alternatively run the R markdown files within e.g. Rstudio.
-
-
-### Tutorials
 
 1) [Predicting and plotting chromatin interactions](./tutorial_predict_and_plot.html)
 
@@ -31,9 +24,20 @@ Checkout the html files from your repo clone or download the html files. It has 
 3) [Train a deepC network](./tutorial_train_a_model.md)
 
 
+### Example bash scripts
+
+1. Example bash script for [deepC training](./example_script_deepc_train.sh).
+
+2. Example bash script for [deepC predictions](./example_script_deepc_predict.sh). Supply a bed like file chr start end seq (0-base half open genomic coordinates) see [./example_variant.bed](./example_variant.bed). A '.' is used to indicate that the genomic region is to be deleted. Alternatively, supply a DNA sequence in uppercase letters that is to replace the genomic window indicated. Lengths do not have to match and this can be a long sequence of several kb or even Mbs. For multiple modifications applied to the same sequence supply a replacement DNA sequence with all desired modifications or use [run_deploy_shape_combination_deepCregr.py](tensorflow2.1plus_compatibility_version/run_deploy_shape_combination_deepCregr.py) to apply a list of modifications.
+
+
 ### Wrapper scripts
 
+In addition, we wrote wrapper scripts that perform standard preprocessing and downstream visualization tasks for deepC from the command line. These are written in R, software and data requirements are outlined below.
+
 #### 1) Wrapper for Hi-C data pre-processing and formatting
+
+[../helper_for_preprocessing_and_analysis/wrapper_preprocess_hic_data.R](../helper_for_preprocessing_and_analysis/wrapper_preprocess_hic_data.R)
 
 ##### Requirements
 
@@ -78,21 +82,107 @@ the specified window size.
 To construct a full training dataset simply concatinate all chromosome output
 files e.g. via `cat coords_and_hic_skeleton_5kb_chr*_IMR90.bed >training_set_IMR90.txt`
 
-*  Example command:
-  ```
-  Rscript ./wrapper_preprocess_hic_data.R \
-    --hic.matrix=chr20_5kb.contacts.KRnorm.matrix \
-    --chromosome.sizes=hg19_chrom_sizes.txt \
-    --sample=IMR90 \
-    --bin.size=5000 \
-    --window.size=1005000 \
-    --chrom=chr20 \
-    --helper=../../repositories/deepC/helper_for_preprocessing_and_analysis \
-    --plot.hic \
-    --plot.skeleton \
-    --plot.start=1e+06 \
-    --plot.end=7000000 \
-    --plot.height=8 \
-    --plot.width=10
-    ```
-* Use `--help` flag for detailed parameter explanations.
+Example command:
+
+```
+Rscript ./wrapper_preprocess_hic_data.R \
+  --hic.matrix=chr20_5kb.contacts.KRnorm.matrix \
+  --chromosome.sizes=hg19_chrom_sizes.txt \
+  --sample=IMR90 \
+  --bin.size=5000 \
+  --window.size=1005000 \
+  --chrom=chr20 \
+  --helper=../../repositories/deepC/helper_for_preprocessing_and_analysis \
+  --plot.hic \
+  --plot.skeleton \
+  --plot.start=1e+06 \
+  --plot.end=7000000 \
+  --plot.height=8 \
+  --plot.width=10
+```
+
+Use `--help` flag for detailed parameter explanations.
+
+#### 2) Wrapper for plotting predictions
+
+[../helper_for_preprocessing_and_analysis/wrapper_preprocess_hic_data.R](../helper_for_preprocessing_and_analysis/wrapper_preprocess_hic_data.R)
+
+
+##### Requirements
+
+* recent version of R with the following libraries:
+  * optparse
+  * tidyverse
+  * cowplot
+  * Rcolorbrewer
+  * rtracklayer - for processing 1D bigwig signals (requires GenomicRanges)
+* if formatting Hi-C from sparse matrix for plotting a working version of
+  perl installed and accessible for command line calls within R is required
+
+###### Inputs
+
+* To plot Hi-C data lot wrapper accepts Hi-C data either
+  * preprocessed deepC input (use preprocess wrapper with `--no.transform`) or
+  * sparse contact matrix input either only a matrix file or a matrix file and bin coordinate file (see preprocessing wrapper.) Providing the preprocessed Hi-C data speeds up the plotting script significantly.
+    * if providing sparse contact matrices to plot Hi-C data a chromosome sizes file is also required
+* To plot skeleton data the wrapper accepts the skeleton deepC format file produced
+from the preprocessing wrapper (or otherwise).
+* To plot deepC predictions the outputs of running `run_deploy_shape_deepCregr.py` or `run_deploy_shape_combination_deepCregr.py` are required.
+  * A reference prediction and a variant prediction can be supplied.
+  * You may use a variant prediction for reference to visualise the difference between two variants
+  * If the reference prediction spans more genomic positions then the variant
+  prediction, the missing variant prediction position can be filled from the reference prediction (`--fill.deepc.var`) to produce a larger variant plot. This assumes that there are no differences in the variant from the reference plot, so only use for genomic
+  positions more then window.size away from any DNA alterations in the variant.
+  * For examples see [example reference](./tutorials/test_predict_out/class_predictions_predict_provided_1_chr17_71000000_71999999.txt) and [example variant](./tutorials/test_variant_out/class_predictions_predict_variant_provided_1_chr17_71706322_71706671.txt) files in [./tutorials/test_predict_out](./tutorials/test_predict_out) and
+[./tutorials/test_variant_out](./tutorials/test_variant_out) respectively.
+* To plot bigwig tracks, e.g. DNase-seq or CTCF ChIP-seq overlapping the region of intersect
+up to three bigwig files can be supplied to the wrapper.
+
+###### Usage
+
+Add a name tag to the plot file using `--sample` set `--out.dir` if not the current working directory. Specify the `--bin.size` and `--window.size` of the Hi-C data and deepC model.
+
+Set he region to plot with `--chrom`, `--plot.start`, `--plot.end` making sure that the correct preprocessed and/or raw Hi-C data input for the selected chromosome is supplied.
+
+Select which plots to produce using the flags `--plot.hic`, `--plot.skeleton`,
+`--plot.deepc.ref`, `--plot.deepc.var`, `--plot.deepc.diff` & `--plot.tracks`.
+
+Set the `--plot.width` and `--plot.height` and if desired set the relative hieghts of each sub plot with a comma separated string via `--rel.heights`.
+
+Link to the appropriate input files: Hi-C either via `--hic.preprocessed` or via `--hic.matrix` (and `--hic.coords` for HiC-Pro style input);
+Skeleton via `--skeleton.input` or is calculated from Hi-C input if desired to plot but no input available;
+DeepC predictions via `--deepc.ref.input` & `--deepc.var.input`;
+Bigwig tracks via `--track.input.1`, `--track.input.2`, `--track.input.3` up to three supported supply in increasing order how many desired to plot.
+
+Set plot titles, track names and track colours as needed. And link to the helper deepC helper script directory: [../helper_for_preprocessing_and_analysis](../helper_for_preprocessing_and_analysis)
+
+Example command:
+```
+Rscript wrapper_plot_deepc_predictions.R --sample=imr90_test \
+        --out.dir='.' \
+        --bin.size 5000 \
+        --window.size 1005000 \
+        --chrom=chr17 \
+        --plot.start=70500000 \
+        --plot.end=72500000 \
+        --plot.width=12 \
+        --plot.height=16 \
+        --rel.heights='0.75,0.75,0.75,0.75,1' \
+        --plot.hic \
+        --plot.skeleton \
+        --plot.deepc.ref \
+        --plot.deepc.var \
+        --fill.deepc.var \
+        --hic.preprocessed=coords_and_hic_skeleton_5kb_chr17_IMR90_notrans.bed \
+        --skeleton.input=coords_and_hic_skeleton_5kb_chr17_IMR90.bed \
+        --deepc.ref.input=test_predict_out/class_predictions_predict_provided_1_chr17_71000000_71999999.txt \
+        --deepc.var.input=test_variant_out/class_predictions_predict_variant_provided_1_chr17_71706322_71706671.txt \
+        --plot.tracks \
+        --track.input.1=./dnase_gm12878_encode_uw_merged_w50.bw \
+        --track.input.2=./ctcf_gm12878_encode_broad_merged_w50.bw \
+        --track.input.3=./dnase_gm12878_encode_uw_merged_w50.bw \
+        --track.colour.1=#756bb1 \
+        --helper=../../repositories/deepC/helper_for_preprocessing_and_analysis/
+```
+
+Use `--help` flag for detailed parameter explanations.

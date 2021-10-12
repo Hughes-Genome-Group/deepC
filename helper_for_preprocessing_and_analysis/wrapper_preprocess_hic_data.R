@@ -47,6 +47,9 @@ option_list = list(
   
   make_option("--keep.median.zero", action="store_true", default=FALSE,
               help="Sets TRUE to keep genomic windows over which the ZigZag interaction pole has median 0 interaction frequency (default remove those).", metavar="boolean"),
+  
+  make_option("--no.transform", action="store_true", default=FALSE,
+              help="Sets TRUE to NOT apply the skeleton percentile binning transformation and store Hi-C frequencies as input from the sparse matrix.", metavar="boolean"),
 
   make_option("--plot.hic", action="store_true", default=FALSE,
               help="Set TRUE to plot an example region plot using the Hi-C data and the region specifcied by --plot.start and --plot.end.", metavar="boolean"),
@@ -196,8 +199,10 @@ tdf <- tdf[,-ncol(tdf)]
 tdf <- as_tibble(tdf)
 
 # Transform to Hi-C skeleton (pyramid percentile binning)
-print('Transforming interactions to skeleton ...')
-tdf <- pyramidBin(tdf)
+if(!opt$no.transform){
+  print('Transforming interactions to skeleton ...')
+  tdf <- pyramidBin(tdf)
+}
 
 # Prepare and save output file -------------------------
 # collate to single comma separated column
@@ -215,14 +220,13 @@ print('Saving deepC file ...')
 write.table(cdf, file = paste0(opt$out.dir, "/coords_and_hic_skeleton_", as.character(bin.size/1000),"kb_", opt$chrom,"_", opt$sample,".bed"),
             col.names = F, row.names = F, quote = F, sep = "\t")
 
-# Opional: Make example plot(s) ------------------------
+# Optional: Make example plot(s) ------------------------
 if(opt$plot.hic | opt$plot.skeleton){
   print('creating example plot ...')
   # if selected to plot hic data example
   if(opt$plot.hic){
     print('Creating Hi-C plot ...')
     # Make a position column, gather and tranform to numeirc interactions bins
-    # take first 1000 entries
     pdf.hic <- hdf %>%
       mutate(pos = start+((end-start)/2)) %>%
       filter(pos >= opt$plot.start, pos <= opt$plot.end) %>%
@@ -245,6 +249,7 @@ if(opt$plot.hic | opt$plot.skeleton){
   # if selected to plot skeleton data
   if(opt$plot.skeleton){
     print('Creating skeleton plot ...')
+    
     # Make a position column, gather and tranform to numeirc interactions bins
     # take first 1000 entries
     pdf.skel <- tdf %>%
@@ -254,6 +259,10 @@ if(opt$plot.hic | opt$plot.skeleton){
       mutate(bin = as.numeric(bin)) %>%
       mutate(pos = if_else(bin %% 2 == 0, pos - bin.size/2, pos))  # adjust positions for 
     # zig-zag layout
+    if(opt$no.transform){
+      # To visualize untransformed data quantile squeeze the very low and very high interaction values
+      pdf.skel$value <- SetValueRange(pdf.skel$value, min=as.numeric(quantile(pdf.skel$value, .05)), max=as.numeric(quantile(pdf.skel$value, .95)))
+    }
     
     # Plot Coverage of interaction windows
     # convert to diamond ploygon map for plotting

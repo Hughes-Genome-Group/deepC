@@ -220,10 +220,11 @@ readDeepcInputHicBed <- function(file, prediction.bins = 101, bin.size = 10000, 
   #  subset to data frame and matrix add pos columnadd position
   df <- sdf[,c(1:3)]
   names(df) <- c("chr", "start", "end")
+  if(gather == TRUE){
   df <- df %>%
     mutate(pos = (end - start)/2 + start) %>%
     select(c(chr, pos))
-
+  }
   # split and fill classes into numeric matrix
   mat <- matrix(data=0, nrow = dim(sdf)[1], ncol = prediction.bins)
   b <- as.character(sdf$qbins)
@@ -238,12 +239,15 @@ readDeepcInputHicBed <- function(file, prediction.bins = 101, bin.size = 10000, 
     sdf <- sdf %>%
       gather(bin, value, -chr, -pos) %>%
       mutate(bin = as.numeric(bin))
+    
+    # correct position for zigzag binning
+    if( zigzag == TRUE){
+      sdf <- sdf %>% mutate(pos = if_else(bin %% 2 == 0, pos - bin.size/2, pos))
+    }
+    
   }
 
-  # correct position for zigzag binning
-  if( zigzag == TRUE){
-    sdf <- sdf %>% mutate(pos = if_else(bin %% 2 == 0, pos - bin.size/2, pos))
-  }
+
 
   return(sdf)
 }
