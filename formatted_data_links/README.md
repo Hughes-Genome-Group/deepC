@@ -5,11 +5,11 @@
 
 -------------------------------------------------------------------------------
 
-### Description
-
-Coming soon ...
-
 ### Links
+
+* convolutional filter weights for for transfer learning obtained from training a [deepHaem](https://github.com/rschwess/deepHaem) CNN
+  * [human](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/saved_conv_weights_dhw_5layer_1k_pool.npz) trained on 932 chromatinfeatures
+  * [mouse](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/saved_conv_weights_mouse_deepc_arch.npy.npz) trained on 1022 chromatin features
 
 * example HiC [skeleton](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/example_skeleton_gm12878_5kb_chr17.bed) chr17 5kb GM12878 primary
 
