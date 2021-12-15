@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # GLOBAL RUN OPTIONS ==========================================================
-SCRIPT_PATH="/path/to/deepC/current_version"
-DATA_FILE="./data_for_training.txt"
+SCRIPT_PATH="./deepC/tensorflow2.1plus_compatibility_version"
+DATA_FILE="./minimal_training_set_example_IMR90.txt"
 
 # Select Test and Validation Chromosomes
 # Test chromosomes will be checked after each epoch
@@ -12,7 +12,7 @@ test_chromosomes='chr12,chr13'
 validation_chromosomes='chr16,chr17'
 
 # Settings ===================================================================
-report_every='20'   # how often to report training loss every X steps
+report_every='10'   # how often to report training loss every X steps
 num_classes='201'  # number of classes (output vector entries), 201 for 5kb models
 # 101 for 10 kb models
 bp_context='1005000'  # bp context processed (1 Mb + 1x bin_size)
@@ -42,12 +42,12 @@ max_pool_scheme='4,5,5,5,2,1'  # max pooling widths
 dilation_scheme='2,4,8,16,32,64,128,256,1'  # dilation rates
 dilation_units='100'  # dilation units/filters throughout
 dilation_width='3'
-dilation_residual=True  # if to use residual connections in the dil layers
+dilation_residual='True'  # if to use residual connections in the dil layers
 
 # Transfer learning settings
 seed_weights=True  # use seeding /transfer learning at all
 seed_scheme='1,1,1,1,1,0'  # specify which layers to seed (1: seed, 0: not seed)
-seed_file='./saved_conv_weights_dhw_5layer_1k_pool.npz' #trained filters phase I download from gitHub link
+seed_file='./saved_conv_weights_human_deepc_arch.npy.npz' #trained filters phase I download from gitHub link
 
 # Other
 shuffle=True
@@ -58,6 +58,8 @@ use_softmasked=False  # specify if to use soft masked bases from the fasta file 
 # if multiple GPUs present select a single one to run training on
 # and not block the remaining
 GPU=0
+
+train_dir='./minimal_imr90_training'
 
 # Run ==========================================================================
 python ${SCRIPT_PATH}/run_training_deepCregr.py \
@@ -83,7 +85,6 @@ python ${SCRIPT_PATH}/run_training_deepCregr.py \
         --dilation_units ${dilation_units} \
         --dilation_width ${dilation_width} \
         --dilation_residual=${dilation_residual} \
-        --dilation_residual_dense=${dilation_residual_dense} \
         --epsilon ${epsilon} \
         --seed_weights=${seed_weights} \
         --seed_scheme ${seed_scheme} \
@@ -96,4 +97,4 @@ python ${SCRIPT_PATH}/run_training_deepCregr.py \
 
 # To continue training from a previous checkpoint use the flags:
 # --model "./my_run/best_checkpoint-10000" \
-# --reload_model 'True'
+# --reload_model=True

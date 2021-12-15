@@ -553,14 +553,14 @@ if(opt$plot.tracks){
 print(paste('Combining', num.sub.plots, 'sub plots ...'))
 
 prio.list <- list()
-if(opt$plot.hic){ prio.list <- c(prio.list, list(p.hic + upper_overlay_theme)) }
-if(opt$plot.skeleton){ prio.list <- c(prio.list, list(p.skel + upper_overlay_theme)) }
-if(opt$plot.deepc.ref){ prio.list <- c(prio.list, list(p.ref + upper_overlay_theme)) }
-if(opt$plot.deepc.var){ prio.list <- c(prio.list, list(p.var + upper_overlay_theme)) }
-if(opt$plot.deepc.diff){ prio.list <- c(prio.list, list(p.diff + upper_overlay_theme)) }
-if(opt$plot.tracks){ prio.list <- c(prio.list, list(p.tracks + upper_overlay_theme)) }
-# set lower theme for bottom plot
-prio.list[[length(prio.list)]] <- prio.list[[length(prio.list)]] + lower_overlay_theme
+if(opt$plot.hic){ prio.list <- c(prio.list, list(p.hic + lower_overlay_theme)) }
+if(opt$plot.skeleton){ prio.list <- c(prio.list, list(p.skel + lower_overlay_theme)) }
+if(opt$plot.deepc.ref){ prio.list <- c(prio.list, list(p.ref + lower_overlay_theme)) }
+if(opt$plot.deepc.var){ prio.list <- c(prio.list, list(p.var + lower_overlay_theme)) }
+if(opt$plot.deepc.diff){ prio.list <- c(prio.list, list(p.diff + lower_overlay_theme)) }
+if(opt$plot.tracks){ prio.list <- c(prio.list, list(p.tracks + lower_overlay_theme)) }
+## set lower theme for bottom plot
+##prio.list[[length(prio.list)]] <- prio.list[[length(prio.list)]] + lower_overlay_theme
 
 p.combined <- plot_grid(plotlist=prio.list,
                         nrow = num.sub.plots, 

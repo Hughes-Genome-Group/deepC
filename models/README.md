@@ -25,6 +25,7 @@ recognize the model this way.
   * [GM12878_primary](http://datashare.molbiol.ox.ac.uk/public/rschwess/deepC/models/model_deepCregr_5kb_GM12878_primary.tar.gz)
   * [GM12878_combined](http://datashare.molbiol.ox.ac.uk/public/rschwess/deepC/models/model_deepCregr_5kb_GM12878_combined.tar.gz)
   * [K562](http://datashare.molbiol.ox.ac.uk/public/rschwess/deepC/models/model_deepCregr_5kb_K562.tar.gz)
+  * [IMR90](http://datashare.molbiol.ox.ac.uk/public/rschwess/deepC/models/model_deepCregr_5kb_IMR90.tar.gz)
   * mouse [mES](http://datashare.molbiol.ox.ac.uk/public/rschwess/deepC/models/model_deepCregr_5kb_mouse_ES.tar.gz)
 
 * 10 kb resolution

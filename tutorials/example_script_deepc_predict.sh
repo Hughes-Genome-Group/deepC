@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # # explanation
-# python ../tensorflow1_version/run_deploy_shape_deepCregr.py --input example_region_short.bed \  # input deepC variant bed-like file
+# python ./deepC/tensorflow2.1plus_compatibility_version/run_deploy_shape_deepCregr.py --input example_region_short.bed \  # input deepC variant bed-like file
 #   --out_dir ./test_predict_out \  #output directory
 #   --name_tag predict \  # name tag to add to ouput files
 #   --model ./model_deepCregr_5kb_GM12878_primary/model \  # trained deepC model downloaded and extracted
@@ -14,11 +14,12 @@
 #   --run_on gpu  # specify to run on gpu or cpu (cpu takes significantly longer)
 
 # actually run
-python ../tensorflow1_version/run_deploy_shape_deepCregr.py --input example_region_short.bed \
+python ./deepC/tensorflow2.1plus_compatibility_version/run_deploy_shape_deepCregr.py \
+  --input example_region_short.bed \
   --out_dir ./test_predict_out \
   --name_tag predict \
   --model ./model_deepCregr_5kb_GM12878_primary/model \
-  --genome ./hg19_chr17_fasta_for_test/hg19_chr17.fa  \
+  --genome ./hg19.fa  \
   --use_softmasked=False  \
   --bp_context 1005000 \
   --add_window 500000 \
@@ -27,11 +28,12 @@ python ../tensorflow1_version/run_deploy_shape_deepCregr.py --input example_regi
   --run_on gpu
 
 # Run in terminal
-python ../tensorflow1_version/run_deploy_shape_deepCregr.py --input example_variant.bed \
+python ./deepC/tensorflow2.1plus_compatibility_version/run_deploy_shape_deepCregr.py \
+  --input example_variant.bed \
   --out_dir ./test_variant_out \
   --name_tag predict_variant \
   --model ./model_deepCregr_5kb_GM12878_primary/model \
-  --genome ./hg19_chr17_fasta_for_test/hg19_chr17.fa  \
+  --genome ./hg19.fa \
   --bp_context 1005000 \
   --add_window 500000 \
   --num_classes 201 \

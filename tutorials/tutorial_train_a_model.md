@@ -68,7 +68,7 @@ dilation_residual=True  # if to use residual connections in the dil layers
 # Transfer learning settings
 seed_weights=True  # use seeding /transfer learning at all
 seed_scheme='1,1,1,1,1,0'  # specify which layers to seed (1: seed, 0: not seed)
-seed_file='./saved_conv_weights_dhw_5layer_1k_pool.npz' #trained filters phase I download from gitHub link
+seed_file='./saved_conv_weights_human_deepc_arch.npy.npz' #trained filters phase I download from gitHub link
 
 # Other
 shuffle=True
@@ -79,6 +79,8 @@ use_softmasked=False  # specify if to use soft masked bases from the fasta file 
 # if multiple GPUs present select a single one to run training on
 # and not block the remaining
 GPU=0
+
+train_dir='./minimal_training_example_run'
 
 # Run ==========================================================================
 python ${SCRIPT_PATH}/run_training_deepCregr.py \
@@ -104,7 +106,6 @@ python ${SCRIPT_PATH}/run_training_deepCregr.py \
         --dilation_units ${dilation_units} \
         --dilation_width ${dilation_width} \
         --dilation_residual=${dilation_residual} \
-        --dilation_residual_dense=${dilation_residual_dense} \
         --epsilon ${epsilon} \
         --seed_weights=${seed_weights} \
         --seed_scheme ${seed_scheme} \
@@ -119,7 +120,7 @@ python ${SCRIPT_PATH}/run_training_deepCregr.py \
 To continue training from a previous checkpoint use the flags:
 ```bash
 --model "./my_run/best_checkpoint-10000" \
---reload_model 'True'
+--reload_model=True
 
 ```
 

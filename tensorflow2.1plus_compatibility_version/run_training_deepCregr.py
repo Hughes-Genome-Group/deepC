@@ -525,8 +525,8 @@ def run_training():
 
   train_chrom_d, train_chroms, train_position, train_regr_bin, test_chrom_d, test_chroms, test_position, test_regr_bin, valid_chrom_d, valid_chroms, valid_position, valid_regr_bin = read_train_file(FLAGS.data_file, NUM_CLASSES, test_chromosomes, validation_chromosomes, FLAGS.store_dtype)
 
-  print(test_chroms)
-  print(valid_chroms)
+  # print(test_chroms)
+  # print(valid_chroms)
 
   # # test a input
   # print('Test chromosomes')

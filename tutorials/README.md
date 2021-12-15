@@ -85,20 +85,20 @@ files e.g. via `cat coords_and_hic_skeleton_5kb_chr*_IMR90.bed >training_set_IMR
 Example command:
 
 ```
-Rscript ./wrapper_preprocess_hic_data.R \
-  --hic.matrix=chr20_5kb.contacts.KRnorm.matrix \
+Rscript ./deepC/helper_for_preprocessing_and_analysis/wrapper_preprocess_hic_data.R \
+  --hic.matrix=chr17_5kb.GM12878.KRnorm.matrix\
   --chromosome.sizes=hg19_chrom_sizes.txt \
-  --sample=IMR90 \
+  --sample=GM128878 \
   --bin.size=5000 \
   --window.size=1005000 \
   --chrom=chr20 \
-  --helper=../../repositories/deepC/helper_for_preprocessing_and_analysis \
+  --helper=./deepC/helper_for_preprocessing_and_analysis \
   --plot.hic \
   --plot.skeleton \
-  --plot.start=1e+06 \
-  --plot.end=7000000 \
-  --plot.height=8 \
-  --plot.width=10
+  --plot.start=2e+06 \
+  --plot.end=2000000 \
+  --plot.height=6 \
+  --plot.width=8
 ```
 
 Use `--help` flag for detailed parameter explanations.
@@ -158,7 +158,7 @@ Set plot titles, track names and track colours as needed. And link to the helper
 
 Example command:
 ```
-Rscript wrapper_plot_deepc_predictions.R --sample=imr90_test \
+Rscript wrapper_plot_deepc_predictions.R --sample=gm12878_test \
         --out.dir='.' \
         --bin.size 5000 \
         --window.size 1005000 \
@@ -173,8 +173,8 @@ Rscript wrapper_plot_deepc_predictions.R --sample=imr90_test \
         --plot.deepc.ref \
         --plot.deepc.var \
         --fill.deepc.var \
-        --hic.preprocessed=coords_and_hic_skeleton_5kb_chr17_IMR90_notrans.bed \
-        --skeleton.input=coords_and_hic_skeleton_5kb_chr17_IMR90.bed \
+        --hic.preprocessed=coords_and_hic_skeleton_5kb_chr17_GM12878_no_transform.bed \
+        --skeleton.input=coords_and_hic_skeleton_5kb_chr17_GM12878.bed \
         --deepc.ref.input=test_predict_out/class_predictions_predict_provided_1_chr17_71000000_71999999.txt \
         --deepc.var.input=test_variant_out/class_predictions_predict_variant_provided_1_chr17_71706322_71706671.txt \
         --plot.tracks \

@@ -8,14 +8,18 @@
 ### Links
 
 * convolutional filter weights for for transfer learning obtained from training a [deepHaem](https://github.com/rschwess/deepHaem) CNN
-  * [human](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/saved_conv_weights_dhw_5layer_1k_pool.npz) trained on 932 chromatinfeatures
+  * [human](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/saved_conv_weights_human_deepc_arch.npy.npz) trained on 932 chromatinfeatures
   * [mouse](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/saved_conv_weights_mouse_deepc_arch.npy.npz) trained on 1022 chromatin features
 
 * example HiC [skeleton](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/example_skeleton_gm12878_5kb_chr17.bed) chr17 5kb GM12878 primary
 
 * example GM12878 [HiC sparse matrix](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/gm12878_primary_chr17_5kb.contacts.KRnorm.matrix.gz) KRnorm (Rao et al.)
 
-* [formatted data](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/data_GM12878_5kb_regression.txt.tar.gz) ready for deepC training (also see `./data_links`)
+* formatted data Hi-C skelton data ready for deepC training
+  * [GM12878 at 5kb resolution](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/data_GM12878_5kb_regression.txt.tar.gz)
+  * [K562 at 5kb resolution](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/data_K562_5kb_regression.txt.tar.gz)
+  * [IMR90 at 5kb resolution](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/data_IMR90_5kb_regression.txt.gz)
+
 
 * [hg19 chr17](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/hg19_chr17_fasta_for_test.tar.gz) fasta and index for tutorial
 
