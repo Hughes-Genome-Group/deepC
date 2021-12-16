@@ -86,7 +86,7 @@ Example command:
 
 ```
 Rscript ./deepC/helper_for_preprocessing_and_analysis/wrapper_preprocess_hic_data.R \
-  --hic.matrix=chr17_5kb.GM12878.KRnorm.matrix\
+  --hic.matrix=gm12878_primary_chr17_5kb.contacts.KRnorm.matrix\
   --chromosome.sizes=hg19_chrom_sizes.txt \
   --sample=GM128878 \
   --bin.size=5000 \

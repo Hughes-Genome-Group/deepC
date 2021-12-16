@@ -7,22 +7,17 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
-library(reticulate)
-
-use_condaenv("tensorflow14", required = T)
-
 ```
 
 
 ```{r, include=FALSE}
 
-setwd("~/Data/machine_learning/deepC_write_tutorials_offline/tutorials/")
+setwd("~/data_local/deepC_write_tutorials_offline/run_deepc_tutorial/")
 
 ```
 
 This tutorial demonstrates how to format HiC data for deepC training. 
-The tutorial walks through formating a single chromosomes. In practice we prepare each 
+The tutorial walks through formating a single chromosome. In practice we prepare each 
 chromosome separately and concatinate all chromosome files in the end to a single file for training.
 
 ### Global Set up
@@ -32,10 +27,11 @@ Load packages and source custom functions for deepC and general HiC processing a
 ```{r packages, message=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(RColorBrewer)
 
-source("../deepC/helper_for_preprocessing_and_analysis/functions_for_HiC.R")
-source("../deepC/helper_for_preprocessing_and_analysis/functions_for_deepC.R")
+source("./deepC/helper_for_preprocessing_and_analysis/functions_for_HiC.R")
+source("./deepC/helper_for_preprocessing_and_analysis/functions_for_deepC.R")
 
 ```
 
@@ -66,9 +62,9 @@ head hg19_chrom_sizes.txt
 
 ### Read in HiC Data
 
-Set the chromosome and read in the HiC data. The skeleton transformation is done chromosome wise and for memory friendliness we recommend doing this separate for each chromosome and concatinating the output into a single file.
+Set the chromosome and read in the Hi-C data. The skeleton transformation is done chromosome wise and for memory friendliness we recommend doing this separate for each chromosome and concatinating the output into a single file.
 
-We support two HiC data formats, both are sparse matrix formats: 
+We support two Hi-C data formats, both are sparse matrix formats: 
 
 1) HiC-Pro style format comprising a sparse matrix with tab separated: *bin_id1 bin_id2 interaction_value* and a second bed-like file that lists the genomic coordinates of the bin_ids *chr start end bin_id*
 
@@ -79,9 +75,9 @@ head gm12878_primary_chr17_5kb.contacts.KRnorm.matrix
 ```
 This matrix has norm factos applied thats why the contact values are not discrete.
 
-Both formats list the left most base of a bin sized intervall as identifier for the bin position.
+Both formats list the left most base of a bin sized interval as identifier for the bin position.
 
-We first read in the HiC data, inspect the object and create a binned genome template for filling.
+We first read in the Hi-C data, inspect the object and create a binned genome template for filling.
 
 ```{r}
 
@@ -118,7 +114,7 @@ start.pos <- hic$start.pos - bin.size/2
 # plotting we create get a binned genome template this requires bedtools 
 # to be installed as the R function calls bedtools in the background in bash
 binned.genome <- getBinnedChrom(chr=chrom, start=start.pos, end=chrom.size, window=window.size, step=bin.size)
-binned.genome <- as.tibble(binned.genome)
+binned.genome <- as_tibble(binned.genome)
 names(binned.genome) <- c("chr", "start", "end")
 # filter out ibcombplete megabase bins
 binned.genome <- binned.genome %>%
@@ -133,11 +129,11 @@ binned.genome
 
 ### Convert to deepC Format
 
-Next we convert the HiC interactions first into deepC format with a vvertical zig-zag pole associated with the center of each bp_context sized sequence window.
-Second we transform the interaction values into the HiC skeleton by applying the pyramid shaped percentile binning. The data are percentile normalized into unequal bins from low to high values in the following scheme: 2x20% 4x10% 4x5% percentiles.
+Next we convert the Hi-C interactions first into deepC format with a vvertical zig-zag pole associated with the center of each bp_context sized sequence window.
+Second we transform the interaction values into the Hi-C skeleton by applying the pyramid shaped percentile binning. The data are percentile normalized into unequal bins from low to high values in the following scheme: 2x20% 4x10% 4x5% percentiles.
 
 ```{r}
-# Convert HiC interaction matrix into genomic windows of bp_context size with the vertical 
+# Convert Hi-C interaction matrix into genomic windows of bp_context size with the vertical 
 # "zig-zag" pole of associated chromatin interactions
 # Get ZigZiag Pole ZickZack Pole of interactions per window
 #    /
@@ -156,13 +152,13 @@ tdf <- getZigZagWindowInteractionsPerl(hic,
          binned.genome, 
          window.size, 
          bin.size,
-         query.pl= "../deepC/helper_for_preprocessing_and_analysis/match_query_table.pl")
+         query.pl= "./deepC/helper_for_preprocessing_and_analysis/match_query_table.pl")
 # tdf <- getZigZagWindowInteractionsPerlMemoryFriendlyFullPerl(hic, 
   # binned.genome, 
   # window.size, 
   # bin.size,
-  # prepare.pl = "../deepC/current_version/......prepare_query_table.pl", #todo
-  # query.pl= "../deepC/helper_for_preprocessing_and_analysis/match_query_table.pl")
+  # prepare.pl = "./deepC/current_version/......prepare_query_table.pl", #todo
+  # query.pl= "./deepC/helper_for_preprocessing_and_analysis/match_query_table.pl")
 
 # Impute zero values in interaction matrix with Median of a 5x5 neighborhood
 # padd with median of respective interaction distance for calculating 
@@ -182,7 +178,7 @@ idf <- medianImputeZerosDataFrame(fdf, k=5)
 idf <- idf[,-ncol(idf)]  #remove padded
 
 # convert to tibble
-idf <- as.tibble(idf)
+idf <- as_tibble(idf)
 
 # pyramid percentile binning
 bdf <- pyramidBin(idf)
@@ -198,7 +194,7 @@ Now we plot a chunk of the skeleton for checking.
 
 ```{r, example_plot, fig.height=3, fig.width=9}
   # Create example plot
-  # Make a position column, gather and tranform to numeirc interactions bins
+  # Make a position column, gather and tranform to numeric interactions bins
   # take first 1000 entries
   pdf <- head(bdf, n=1000) %>%
     mutate(pos = start+((end-start)/2)) %>%
@@ -235,13 +231,13 @@ Now we just need to store the data in txt format.
   bdf
   
   # and save in plain txt
-  write.table(bdf, file = paste0("coords_and_hic_skeleton_for_deepC_5kb_", chrom,".bed"),
+  write.table(bdf, file = paste0("hic_skeleton_for_deepC_5kb_", chrom,".bed"),
               col.names = F, row.names = F, quote = F, sep = "\t")
   
 ```
 
 
-This will store a file per chromosome, which we then concatinate into a single file for all chromosomes and supply this to the deepC training routines. Find an example under *formatted_data_links*.
+This will store a file per chromosome, which we then concatinate into a single file for all chromosomes and supply this to the deepC training routines. Find links to data fully formatted for training under *formatted_data_links*.
 
 
 

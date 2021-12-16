@@ -7,9 +7,9 @@
 
 ### Preparation
 
-Follow the tutorial for processing your own HiC data. Generate a formatted file of the HiC skeleton encoded for deepC training for every chromosome of interest such as the *coords_and_hic_skeleton_for_deepC_5kb_chr17.bed* from the tutorial. Concatinate all chromosomes of interest including test and validation (they will be masked in the training).
+Follow the tutorial for processing your own HiC data. Generate a formated file of the Hi-C skeleton encoded for deepC training for every chromosome of interest such as the *hic_skeleton_for_deepC_5kb_chr17.bed* from the tutorial. Concatinate all chromosomes of interest including test and validation (they will be masked in the training).
 
-(e.g. `cat coords_* >data_for_training.txt`)
+(e.g. `cat hic_skeleton_* >data_for_training.txt`)
 
 Run the trainng as detailed below. Note training will require a GPU with sufficient memory. We trained on NVIDIA Titan V cards with 12 GB of memory. Training on 3 chromosomes can already give good results but final models should be trained for at least one epoch.
 
