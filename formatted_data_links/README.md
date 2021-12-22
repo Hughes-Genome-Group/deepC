@@ -20,6 +20,7 @@
   * [GM12878 at 5kb resolution](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/data_GM12878_5kb_regression.txt.tar.gz)
   * [K562 at 5kb resolution](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/data_K562_5kb_regression.txt.tar.gz)
   * [IMR90 at 5kb resolution](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/data_IMR90_5kb_regression.txt.gz)
+  * [Mouse mES at 5kb resolution](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/data_mES_5kb_regression.txt.gz)
 
 
 * a [minimal training set](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/minimal_training_set_example_IMR90.txt.gz) using only the first 100 lines of IMR90 5kb chromatin interactions in skeleton format. Recommend for fast testing of training procedure.

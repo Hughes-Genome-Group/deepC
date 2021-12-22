@@ -80,7 +80,7 @@ file there for details.
 
 ### Publication
 
-Please refer to the bioRxiv preprint [here](https://www.biorxiv.org/content/10.1101/724005v1)
+Please refer to the Nature Methods article [here](https://www.nature.com/articles/s41592-020-0960-3)
 
 ### Acknowledgements
 

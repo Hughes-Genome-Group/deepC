@@ -518,6 +518,7 @@ if(opt$plot.tracks){
       stop('Please supply a bigwig track 1 if attempting to supply track 2 or switch.')
     }
     df.tracks <- rbind(df.tracks, df.track.2 %>% mutate(source = opt$track.name.2))
+    df.tracks <- df.tracks %>% mutate(source = factor(source, levels = c(opt$track.name.1, opt$track.name.2)))
     selected.track.colours <- c(selected.track.colours, opt$track.colour.2)
   }
   if(opt$track.input.3 != 'None'){
@@ -530,6 +531,7 @@ if(opt$plot.tracks){
       stop('Please supply a bigwig track 1 if attempting to supply track 3 or switch.')
     }
     df.tracks <- rbind(df.tracks, df.track.3 %>% mutate(source = opt$track.name.3))
+    df.tracks <- df.tracks %>% mutate(source = factor(source, levels = c(opt$track.name.1, opt$track.name.2, opt$track.name.3)))
     selected.track.colours <- c(selected.track.colours, opt$track.colour.3)
   }
   
@@ -553,13 +555,13 @@ if(opt$plot.tracks){
 print(paste('Combining', num.sub.plots, 'sub plots ...'))
 
 prio.list <- list()
-if(opt$plot.hic){ prio.list <- c(prio.list, list(p.hic + lower_overlay_theme)) }
-if(opt$plot.skeleton){ prio.list <- c(prio.list, list(p.skel + lower_overlay_theme)) }
-if(opt$plot.deepc.ref){ prio.list <- c(prio.list, list(p.ref + lower_overlay_theme)) }
-if(opt$plot.deepc.var){ prio.list <- c(prio.list, list(p.var + lower_overlay_theme)) }
-if(opt$plot.deepc.diff){ prio.list <- c(prio.list, list(p.diff + lower_overlay_theme)) }
+if(opt$plot.hic){ prio.list <- c(prio.list, list(p.hic + upper_overlay_theme)) }
+if(opt$plot.skeleton){ prio.list <- c(prio.list, list(p.skel + upper_overlay_theme)) }
+if(opt$plot.deepc.ref){ prio.list <- c(prio.list, list(p.ref + upper_overlay_theme)) }
+if(opt$plot.deepc.var){ prio.list <- c(prio.list, list(p.var + upper_overlay_theme)) }
+if(opt$plot.deepc.diff){ prio.list <- c(prio.list, list(p.diff + upper_overlay_theme)) }
 if(opt$plot.tracks){ prio.list <- c(prio.list, list(p.tracks + lower_overlay_theme)) }
-## set lower theme for bottom plot
+# set lower theme for bottom plot
 ##prio.list[[length(prio.list)]] <- prio.list[[length(prio.list)]] + lower_overlay_theme
 
 p.combined <- plot_grid(plotlist=prio.list,
@@ -569,6 +571,6 @@ p.combined <- plot_grid(plotlist=prio.list,
 
 ggsave(p.combined, filename = paste0(opt$out.dir, '/plot_', as.character(bin.size/1000),"kb_", opt$sample, '_', 
                                      opt$chrom, '_', opt$plot.start, '_', opt$plot.end, '.png'), 
-                                     width = opt$plot.width, height = opt$plot.height, bg = 'white')
+                                     width = opt$plot.width, height = opt$plot.height, bg = 'white', dpi=300)
 
 
