@@ -11,11 +11,11 @@ These tutorials follow the workflow we use for deepC predictions, analysis and v
 
 The deep learning framework and the deepC predictions itself are run via python scripts.
 
-The downstream analysis and visualizations is done within R using tidyverse and custom functions for working with deepC predictions and HiC data in general.
+The downstream analysis and visualizations are done within R using tidyverse and custom functions for working with deepC predictions and Hi-C data in general.
 
 The tutorials use the *current_version* scripts for tensorflow 1.14. If you are running on 1.8 just switch the script links to the legacy version.
 
-Checkout the html files from your repo clone or download the html files. It has some plots that lead to a bigger file size so gitHub can't visualize it straight online. Alternatively run the R markdown files within e.g. Rstudio.
+Checkout the html files from your repo clone or download the html files. It has some plots that lead to a bigger file size so gitHub can't visualize it straight online. Alternatively run the R markdown files within e.g. RStudio.
 
 1) [Predicting and plotting chromatin interactions](./tutorial_predict_and_plot.html)
 

@@ -27,4 +27,4 @@ in a tab separated file with bed 0-based coordinate encoding, *replacer* being t
 
 ### Note
 
-If help messages for command line arguments don't display, please, for now, have a look at the script. I will switch tf.app.flags for argparse in the future.
+If help messages for command line arguments don't display, please have a look at the script.

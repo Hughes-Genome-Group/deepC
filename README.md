@@ -47,7 +47,7 @@ and deepC predictions.
   * `pip install pysam`
 
 * Clone the **deepC** github repository
-* Check which version of tensorflow you have installed and choose the apropriate compatibility version of deepC
+* Check which version of tensorflow you have installed and choose the appropriate compatibility version of deepC
 
 | tensorflow version |  CUDA version | deepC version  |
 | ------------------ |:-------------:| --------------:|
@@ -58,11 +58,11 @@ and deepC predictions.
 
 *Compatibility with v2.0 not yet tested.
 
-### Required Ressources
+### Required Resources
 
-  * training deepC models requires running with GPU support for several hours (up to days depending on the dataset and epochs aimed for)
-  * running predictions is feasible without but runs significantly faster with a GPU
-  * for example predicting the impact of a variant as in the tutorial provided requires ~5 mins with GPU support and ~ 2h on CPU.
+  * Training deepC models requires running with GPU support for several hours (up to days depending on the dataset and epochs aimed for)
+  * Running predictions is feasible without but runs significantly faster with a GPU
+  * For example predicting the impact of a variant as in the tutorial provided requires ~ 5 mins with GPU support and ~ 2h on CPU.
 
 ### Installation
 

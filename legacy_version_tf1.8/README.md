@@ -4,9 +4,9 @@
 
 ### Description
 
-Tensorflow 1.8.0 implementation of deepC. This is version of tensorflow under
+Tensorflow 1.8.0 implementation of deepC. This is the version of tensorflow under
 which we developed deepC. This version should be compatible with all
-later versions of tensorflow, bearing with deprecation warnings. Only
+later versions of tensorflow1, bearing with deprecation warnings. Only
 tensorflow 1.14.0 has been tested though.
 
 ### Content
@@ -16,11 +16,11 @@ and dilated convolutional layers. Residuals (in the dilated layers) and batch no
 
 * **deepCregr_utility.py** model implementation with more flexible intermediate outputs mainly for saliency computation
 
-* **run_training_deepCregr.py** script for training a deepC model, requires formated/pre-rpocssed data such as the provided ones and a link to the matching reference genome.fa and .fai file
+* **run_training_deepCregr.py** script for training a deepC model, requires formated/pre-processed data such as the provided ones and a link to the matching reference genome.fa and .fai file
 
 * **run_deploy_shape_deepCregr.py** script to run prediction from sequence.
 Requires a trained deepC model and a bed like file with chrom start end replace
-in a tab separated file with bed 0-based coordinate encoding, *replacer* being the sequence you want to exchange the respective genomic window for. Use reference if you want to run on the reference sequence.
+in a tab-separated file with bed 0-based coordinate encoding, *replacer* being the sequence you want to exchange the respective genomic window for. Use reference if you want to run on the reference sequence.
 
 * **run_deploy_shape_combination_deepCregr.py** same as above but applies all variants listed in the input file to the sequence before running the prediction. For multiple variants.
 
@@ -29,4 +29,4 @@ in a tab separated file with bed 0-based coordinate encoding, *replacer* being t
 
 ### Note
 
-If help messages for command line arguments don't display, please, for now, have a look at the script. I will switch tf.app.flags for argparse in the future.
+If help messages for command line arguments don't display, please have a look at the script.

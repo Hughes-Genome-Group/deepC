@@ -9,10 +9,10 @@ visualization and analysis.
 
 ### Contents
 
-* `example_head_10lines_data_K562_5kb_regression.txt` - example file including 10 lines of how to prepare Hi-C data for input to the deepC training script.
+* `example_head_10lines_data_K562_5kb_regression.txt` - example file including 10 lines demonstrating how to prepare Hi-C data for input to the deepC training script.
   * Format: chr start stop percentile_tags (comma separated)
   * each region is a 1 Mb + 1x bin_size region
-  * the comma separaed percentile tags correspond to the normalized Hi-C interaction values over the center of that region
+  * the comma separated percentile tags correspond to the normalized Hi-C interaction values over the center of that region
   * regions are incremented in bin_size steps.
 * `functions_for_deepC` - R functions for preprocessing Hi-C data to deepC format
 and helper for analysing and visualizing deepC predictions e.g.:
