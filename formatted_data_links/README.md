@@ -7,6 +7,8 @@
 
 ### Links
 
+Note: Links are temporarily not working, please access them via the [Zenodo archive](https://zenodo.org/records/5785805).
+
 * convolutional filter weights for transfer learning obtained from training a [deepHaem](https://github.com/rschwess/deepHaem) CNN
   * [human](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/saved_conv_weights_human_deepc_arch.npy.npz) trained on 932 chromatinfeatures
   * [mouse](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/saved_conv_weights_mouse_deepc_arch.npy.npz) trained on 1022 chromatin features
@@ -30,3 +32,8 @@
 * [hg19](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/hg19_ref_genome.tar.gz) fasta and index for whole genome
 
 * example [DNase-seq](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/dnase_gm12878_encode_uw_merged_w50.bw) and [CTCF ChIP-seq](http://userweb.molbiol.ox.ac.uk/datashare/rschwess/deepC/data_links/ctcf_gm12878_encode_broad_merged_w50.bw) bigwig tracks from ENCODE for tutorial
+
+
+### File Archive
+
+All files are also archived at [Zenodo](https://zenodo.org/records/5785805)/
