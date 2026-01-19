@@ -22,18 +22,18 @@ recognize the model this way.
 ### Links
 
 * 5 kb resolution
-  * [GM12878_primary](https://datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_5kb_GM12878_primary.tar.gz)
-  * [GM12878_combined](https://datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_5kb_GM12878_combined.tar.gz)
-  * [K562](https://datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_5kb_K562.tar.gz)
-  * [IMR90](https://datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_5kb_IMR90.tar.gz)
-  * mouse [mES](https://datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_5kb_mouse_ES.tar.gz)
+  * [GM12878_primary](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_5kb_GM12878_primary.tar.gz)
+  * [GM12878_combined](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_5kb_GM12878_combined.tar.gz)
+  * [K562](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_5kb_K562.tar.gz)
+  * [IMR90](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_5kb_IMR90.tar.gz)
+  * mouse [mES](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_5kb_mouse_ES.tar.gz)
 
 * 10 kb resolution
-  * [GM12878_primary](https://datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_GM12878_primary.tar.gz)
-  * [GM12878_combined](https:/datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_GM12878_primary.tar.gz)
-  * [K562](https://datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_K562.tar.gz)
-  * [KBM7](https://datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_KBM7.tar.gz)
-  * [HMEC](https://datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_HMEC.tar.gz)
-  * [HUVEC](https://datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_HUVEC.tar.gz)
-  * [IMR90](https://datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_IMR90.tar.gz)
-  * [NHEK](https://datashare.molbiol.ox.ac.uk/public/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_NHEK.tar.gz)
+  * [GM12878_primary](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_GM12878_primary.tar.gz)
+  * [GM12878_combined](https:/datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_GM12878_primary.tar.gz)
+  * [K562](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_K562.tar.gz)
+  * [KBM7](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_KBM7.tar.gz)
+  * [HMEC](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_HMEC.tar.gz)
+  * [HUVEC](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_HUVEC.tar.gz)
+  * [IMR90](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_IMR90.tar.gz)
+  * [NHEK](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_NHEK.tar.gz)
