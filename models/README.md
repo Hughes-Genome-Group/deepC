@@ -30,7 +30,7 @@ recognize the model this way.
 
 * 10 kb resolution
   * [GM12878_primary](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_GM12878_primary.tar.gz)
-  * [GM12878_combined](https:/datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_GM12878_primary.tar.gz)
+  * [GM12878_combined](https:/datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_GM12878_combined.tar.gz)
   * [K562](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_K562.tar.gz)
   * [KBM7](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_KBM7.tar.gz)
   * [HMEC](https://datashare.molbiol.ox.ac.uk/public/project/fgenomics/rschwess/deepC/models/model_deepCregr_10kb_HMEC.tar.gz)
